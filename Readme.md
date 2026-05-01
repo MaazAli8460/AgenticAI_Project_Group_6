@@ -61,9 +61,32 @@ These commands will be used once the backend and frontend entrypoints are implem
 - Backend: uvicorn backend.app:app --reload
 - Frontend: npm run dev (from frontend/)
 
+## Run (Current)
+Phase 1 can be executed directly:
+```bash
+python run_phase1.py "A young astronaut discovers a hidden ocean on Mars and must decide whether to reveal it."
+```
+Outputs are saved to data/outputs/phase1/<project_id>.json. Use --stdout to also print JSON.
+
 ## Testing (Planned)
 - Backend/unit tests: pytest
 - Phase tests: per-agent tests under agents/*/tests
 
 ## Status
-Skeleton scaffold with shared schema and contracts defined. Phase implementations and endpoints will be added next.
+Completed:
+- Shared JSON schema + Pydantic models
+- Phase 1 story generation with Groq LLM
+- Prompt engineering helper for Phase 1
+- Phase 1 CLI runner with file output
+
+In progress:
+- Phase 2 audio generation
+- Phase 3 video composition
+- Phase 4 web interface
+- Phase 5 edit agent and undo
+
+## Next Steps
+1. Phase 2: build TTS pipeline and timing manifest writer.
+2. Phase 3: add image generation + FFmpeg compositing.
+3. Phase 4: create FastAPI endpoints + React UI for orchestration.
+4. Phase 5: implement intent classifier, edit executor, and state history.
