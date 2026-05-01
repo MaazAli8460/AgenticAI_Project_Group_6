@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/agenticai/pipeline_state.schema.json",
+  "title": "PipelineState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "meta",
+    "story",
+    "scenes",
+    "characters"
+  ],
+  "properties": {
+    "meta": { "$ref": "#/$defs/ProjectMeta" },
+    "story": { "$ref": "#/$defs/Story" },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Scene" }
+    },
+    "characters": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Character" }
+    },
+    "audio": { "$ref": "#/$defs/AudioState" },
+    "video": { "$ref": "#/$defs/VideoState" },
+    "edits": { "$ref": "#/$defs/EditHistory" }
+  },
+  "$defs": {
+    "ProjectMeta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "prompt",
+        "created_at",
+        "version"
+      ],
+      "properties": {
+        "project_id": { "type": "string" },
+        "prompt": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "version": { "type": "integer", "minimum": 1 },
+        "language": { "type": "string" },
+        "seed": { "type": "integer" },
+        "total_duration_s": { "type": "number", "minimum": 0 },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "Story": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logline",
+        "synopsis"
+      ],
+      "properties": {
+        "logline": { "type": "string" },
+        "synopsis": { "type": "string" },
+        "genre": { "type": "string" },
+        "theme": { "type": "string" },
+        "tone": { "type": "string" },
+        "style": { "type": "string" },
+        "target_duration_s": { "type": "number", "minimum": 0 }
+      }
+    },
+    "VoiceProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "style"
+      ],
+      "properties": {
+        "style": { "type": "string" },
+        "gender": { "type": "string" },
+        "age": { "type": "string" },
+        "accent": { "type": "string" },
+        "model": { "type": "string" },
+        "params": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "VisualProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description"
+      ],
+      "properties": {
+        "description": { "type": "string" },
+        "style": { "type": "string" },
+        "palette": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "references": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "Character": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "role",
+        "description",
+        "voice",
+        "visual"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "description": { "type": "string" },
+        "voice": { "$ref": "#/$defs/VoiceProfile" },
+        "visual": { "$ref": "#/$defs/VisualProfile" }
+      }
+    },
+    "DialogueLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "character_id",
+        "text"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "character_id": { "type": "string" },
+        "text": { "type": "string" },
+        "emotion": { "type": "string" },
+        "direction": { "type": "string" },
+        "start_ms": { "type": "integer", "minimum": 0 },
+        "end_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "Scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "description",
+        "setting",
+        "mood",
+        "duration_s",
+        "visual_prompt",
+        "dialogue"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "setting": { "type": "string" },
+        "mood": { "type": "string" },
+        "style": { "type": "string" },
+        "duration_s": { "type": "number", "minimum": 0 },
+        "visual_prompt": { "type": "string" },
+        "camera": { "type": "string" },
+        "motion": { "type": "string" },
+        "bgm_mood": { "type": "string" },
+        "bgm_style": { "type": "string" },
+        "dialogue": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DialogueLine" }
+        }
+      }
+    },
+    "AudioLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line_id",
+        "scene_id",
+        "character_id",
+        "audio_file"
+      ],
+      "properties": {
+        "line_id": { "type": "string" },
+        "scene_id": { "type": "string" },
+        "character_id": { "type": "string" },
+        "audio_file": { "type": "string" },
+        "start_ms": { "type": "integer", "minimum": 0 },
+        "end_ms": { "type": "integer", "minimum": 0 },
+        "voice_params": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "BgmTrack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scene_id",
+        "audio_file"
+      ],
+      "properties": {
+        "scene_id": { "type": "string" },
+        "audio_file": { "type": "string" },
+        "start_ms": { "type": "integer", "minimum": 0 },
+        "end_ms": { "type": "integer", "minimum": 0 },
+        "mood": { "type": "string" },
+        "style": { "type": "string" }
+      }
+    },
+    "TimingEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scene_id",
+        "line_id",
+        "audio_file",
+        "start_ms",
+        "end_ms"
+      ],
+      "properties": {
+        "scene_id": { "type": "string" },
+        "line_id": { "type": "string" },
+        "character_id": { "type": "string" },
+        "audio_file": { "type": "string" },
+        "start_ms": { "type": "integer", "minimum": 0 },
+        "end_ms": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "AudioState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timing_manifest"
+      ],
+      "properties": {
+        "lines": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/AudioLine" }
+        },
+        "bgm_tracks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/BgmTrack" }
+        },
+        "timing_manifest": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TimingEntry" }
+        }
+      }
+    },
+    "SceneAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scene_id"
+      ],
+      "properties": {
+        "scene_id": { "type": "string" },
+        "image_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "clip_file": { "type": "string" },
+        "subtitle_file": { "type": "string" },
+        "transition": { "type": "string" }
+      }
+    },
+    "VideoState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scene_assets",
+        "final_video_file"
+      ],
+      "properties": {
+        "scene_assets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SceneAsset" }
+        },
+        "final_video_file": { "type": "string" },
+        "subtitle_file": { "type": "string" }
+      }
+    },
+    "VersionRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "timestamp",
+        "summary",
+        "state_path",
+        "asset_paths"
+      ],
+      "properties": {
+        "version": { "type": "integer", "minimum": 1 },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "summary": { "type": "string" },
+        "state_path": { "type": "string" },
+        "asset_paths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "changed_fields": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "EditHistory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "versions"
+      ],
+      "properties": {
+        "versions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/VersionRecord" }
+        }
+      }
+    }
+  }
+}
