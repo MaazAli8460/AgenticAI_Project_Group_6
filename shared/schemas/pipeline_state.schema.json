@@ -25,7 +25,8 @@
     },
     "audio": { "$ref": "#/$defs/AudioState" },
     "video": { "$ref": "#/$defs/VideoState" },
-    "edits": { "$ref": "#/$defs/EditHistory" }
+    "edits": { "$ref": "#/$defs/EditHistory" },
+    "phases": { "$ref": "#/$defs/PhaseStatusMap" }
   },
   "$defs": {
     "ProjectMeta": {
@@ -35,7 +36,8 @@
         "project_id",
         "prompt",
         "created_at",
-        "version"
+        "version",
+        "schema_version"
       ],
       "properties": {
         "project_id": { "type": "string" },
@@ -43,6 +45,7 @@
         "created_at": { "type": "string", "format": "date-time" },
         "updated_at": { "type": "string", "format": "date-time" },
         "version": { "type": "integer", "minimum": 1 },
+        "schema_version": { "type": "string" },
         "language": { "type": "string" },
         "seed": { "type": "integer" },
         "total_duration_s": { "type": "number", "minimum": 0 },
@@ -159,6 +162,7 @@
       ],
       "properties": {
         "id": { "type": "string" },
+        "order": { "type": "integer", "minimum": 1 },
         "title": { "type": "string" },
         "description": { "type": "string" },
         "setting": { "type": "string" },
@@ -170,6 +174,10 @@
         "motion": { "type": "string" },
         "bgm_mood": { "type": "string" },
         "bgm_style": { "type": "string" },
+        "character_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
         "dialogue": {
           "type": "array",
           "items": { "$ref": "#/$defs/DialogueLine" }
@@ -190,6 +198,7 @@
         "scene_id": { "type": "string" },
         "character_id": { "type": "string" },
         "audio_file": { "type": "string" },
+        "text": { "type": "string" },
         "start_ms": { "type": "integer", "minimum": 0 },
         "end_ms": { "type": "integer", "minimum": 0 },
         "voice_params": {
@@ -251,7 +260,8 @@
         "timing_manifest": {
           "type": "array",
           "items": { "$ref": "#/$defs/TimingEntry" }
-        }
+        },
+        "final_audio_file": { "type": "string" }
       }
     },
     "SceneAsset": {
@@ -284,7 +294,9 @@
           "items": { "$ref": "#/$defs/SceneAsset" }
         },
         "final_video_file": { "type": "string" },
-        "subtitle_file": { "type": "string" }
+        "subtitle_file": { "type": "string" },
+        "resolution": { "type": "string" },
+        "fps": { "type": "number", "exclusiveMinimum": 0 }
       }
     },
     "VersionRecord": {
@@ -309,20 +321,67 @@
         "changed_fields": {
           "type": "array",
           "items": { "type": "string" }
-        }
+        },
+        "phase": { "type": "string" },
+        "operation": { "type": "string" }
       }
     },
     "EditHistory": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "current_version",
         "versions"
       ],
       "properties": {
+        "current_version": { "type": "integer", "minimum": 1 },
         "versions": {
           "type": "array",
           "items": { "$ref": "#/$defs/VersionRecord" }
         }
+      }
+    },
+    "ErrorRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "message"
+      ],
+      "properties": {
+        "code": { "type": "string" },
+        "message": { "type": "string" },
+        "details": { "type": "string" }
+      }
+    },
+    "PhaseStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "running", "complete", "error"]
+        },
+        "run_id": { "type": "string" },
+        "updated_at": { "type": "string", "format": "date-time" },
+        "message": { "type": "string" },
+        "errors": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ErrorRecord" }
+        }
+      }
+    },
+    "PhaseStatusMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "story": { "$ref": "#/$defs/PhaseStatus" },
+        "audio": { "$ref": "#/$defs/PhaseStatus" },
+        "video": { "$ref": "#/$defs/PhaseStatus" },
+        "web": { "$ref": "#/$defs/PhaseStatus" },
+        "edit": { "$ref": "#/$defs/PhaseStatus" }
       }
     }
   }

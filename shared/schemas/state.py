@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -11,6 +11,7 @@ class ProjectMeta(BaseModel):
     prompt: str
     created_at: datetime
     version: int = Field(ge=1)
+    schema_version: str = "1.0"
     updated_at: Optional[datetime] = None
     language: Optional[str] = None
     seed: Optional[int] = None
@@ -72,11 +73,13 @@ class Scene(BaseModel):
     duration_s: float = Field(ge=0)
     visual_prompt: str
     dialogue: list[DialogueLine] = Field(default_factory=list)
+    order: Optional[int] = Field(default=None, ge=1)
     style: Optional[str] = None
     camera: Optional[str] = None
     motion: Optional[str] = None
     bgm_mood: Optional[str] = None
     bgm_style: Optional[str] = None
+    character_ids: list[str] = Field(default_factory=list)
 
 
 class TimingEntry(BaseModel):
@@ -93,6 +96,7 @@ class AudioLine(BaseModel):
     scene_id: str
     character_id: str
     audio_file: str
+    text: Optional[str] = None
     start_ms: Optional[int] = Field(default=None, ge=0)
     end_ms: Optional[int] = Field(default=None, ge=0)
     voice_params: dict[str, object] = Field(default_factory=dict)
@@ -111,6 +115,7 @@ class AudioState(BaseModel):
     timing_manifest: list[TimingEntry] = Field(default_factory=list)
     lines: list[AudioLine] = Field(default_factory=list)
     bgm_tracks: list[BgmTrack] = Field(default_factory=list)
+    final_audio_file: Optional[str] = None
 
 
 class SceneAsset(BaseModel):
@@ -125,6 +130,8 @@ class VideoState(BaseModel):
     scene_assets: list[SceneAsset] = Field(default_factory=list)
     final_video_file: Optional[str] = None
     subtitle_file: Optional[str] = None
+    resolution: Optional[str] = None
+    fps: Optional[float] = Field(default=None, gt=0)
 
 
 class VersionRecord(BaseModel):
@@ -134,10 +141,35 @@ class VersionRecord(BaseModel):
     state_path: str
     asset_paths: list[str] = Field(default_factory=list)
     changed_fields: list[str] = Field(default_factory=list)
+    phase: Optional[str] = None
+    operation: Optional[str] = None
 
 
 class EditHistory(BaseModel):
+    current_version: int = Field(ge=1)
     versions: list[VersionRecord] = Field(default_factory=list)
+
+
+class ErrorRecord(BaseModel):
+    message: str
+    code: Optional[str] = None
+    details: Optional[str] = None
+
+
+class PhaseStatus(BaseModel):
+    status: Literal["pending", "running", "complete", "error"]
+    run_id: Optional[str] = None
+    updated_at: Optional[datetime] = None
+    message: Optional[str] = None
+    errors: list[ErrorRecord] = Field(default_factory=list)
+
+
+class PhaseStatusMap(BaseModel):
+    story: Optional[PhaseStatus] = None
+    audio: Optional[PhaseStatus] = None
+    video: Optional[PhaseStatus] = None
+    web: Optional[PhaseStatus] = None
+    edit: Optional[PhaseStatus] = None
 
 
 class PipelineState(BaseModel):
@@ -148,3 +180,4 @@ class PipelineState(BaseModel):
     audio: Optional[AudioState] = None
     video: Optional[VideoState] = None
     edits: Optional[EditHistory] = None
+    phases: Optional[PhaseStatusMap] = None

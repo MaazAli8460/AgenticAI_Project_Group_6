@@ -49,7 +49,8 @@ npm install
 ## Configuration
 Create a .env file at the repo root with any required keys. Example:
 ```
-LLM_API_KEY=
+GROQ_API_KEY=
+GROQ_MODEL=llama-3.3-70b-versatile
 TTS_API_KEY=
 IMG_API_KEY=
 BGM_API_KEY=

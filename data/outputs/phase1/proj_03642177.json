@@ -1,0 +1,223 @@
+{
+  "meta": {
+    "project_id": "proj_03642177",
+    "prompt": "A young astronaut discovers a hidden ocean on Mars and must decide whether to reveal it.",
+    "created_at": "2026-05-01T19:27:44.565216Z",
+    "version": 1,
+    "schema_version": "1.0",
+    "updated_at": "2026-05-01T19:27:44.565216Z",
+    "language": null,
+    "seed": null,
+    "total_duration_s": 30.0,
+    "tags": [
+      "phase1",
+      "story"
+    ]
+  },
+  "story": {
+    "logline": "A young astronaut's discovery of a hidden ocean on Mars sparks a dilemma: reveal it and risk the planet, or keep it secret and sacrifice progress.",
+    "synopsis": "Astronaut Maya discovers a hidden ocean on Mars, and must decide whether to reveal it to the world, potentially risking the planet's ecosystem, or keep it a secret, sacrificing the potential for new discoveries and progress.",
+    "genre": "Science Fiction",
+    "theme": "Responsibility and Progress",
+    "tone": "Contemplative",
+    "style": "Realistic",
+    "target_duration_s": 30.0
+  },
+  "scenes": [
+    {
+      "id": "scene_1",
+      "title": "Discovery",
+      "description": "Maya discovers the hidden ocean on Mars",
+      "setting": "Mars surface, near a massive ice cliff",
+      "mood": "Awe-inspired",
+      "duration_s": 5.0,
+      "visual_prompt": "A vast, icy landscape with a massive cliff, and a glimmer of blue water in the distance",
+      "dialogue": [
+        {
+          "id": "line_1",
+          "character_id": "char_1",
+          "text": "Oh my... it can't be.",
+          "emotion": "Awe",
+          "direction": "Whispering to herself",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 1,
+      "style": "Realistic",
+      "camera": "Wide shot, panning over the landscape",
+      "motion": "Slow and sweeping",
+      "bgm_mood": "Wonder",
+      "bgm_style": "Orchestral",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_2",
+      "title": "Dilemma",
+      "description": "Maya grapples with the implications of her discovery",
+      "setting": "Maya's spaceship, in orbit around Mars",
+      "mood": "Contemplative",
+      "duration_s": 10.0,
+      "visual_prompt": "Maya sitting in front of a control panel, looking concerned and unsure",
+      "dialogue": [
+        {
+          "id": "line_2",
+          "character_id": "char_1",
+          "text": "What do I do now?",
+          "emotion": "Uncertainty",
+          "direction": "Thinking aloud",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 2,
+      "style": "Realistic",
+      "camera": "Close-up, focusing on Maya's face",
+      "motion": "Still and introspective",
+      "bgm_mood": "Uncertainty",
+      "bgm_style": "Piano",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_3",
+      "title": "Decision",
+      "description": "Maya decides to contact Mission Control for guidance",
+      "setting": "Maya's spaceship, in orbit around Mars",
+      "mood": "Determined",
+      "duration_s": 5.0,
+      "visual_prompt": "Maya speaking into a communication device, looking resolute",
+      "dialogue": [
+        {
+          "id": "line_3",
+          "character_id": "char_1",
+          "text": "Mission Control, this is Maya. I need guidance.",
+          "emotion": "Determination",
+          "direction": "Speaking into the communication device",
+          "start_ms": null,
+          "end_ms": null
+        },
+        {
+          "id": "line_4",
+          "character_id": "char_2",
+          "text": "Maya, we read you. What's your situation?",
+          "emotion": "Professional",
+          "direction": "Responding through the communication device",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 3,
+      "style": "Realistic",
+      "camera": "Medium shot, showing Maya's upper body",
+      "motion": "Slow and deliberate",
+      "bgm_mood": "Resolution",
+      "bgm_style": "Electronic",
+      "character_ids": [
+        "char_1",
+        "char_2"
+      ]
+    },
+    {
+      "id": "scene_4",
+      "title": "Resolution",
+      "description": "Maya makes a decision, and the consequences unfold",
+      "setting": "Mars surface, near the hidden ocean",
+      "mood": "Hopeful",
+      "duration_s": 10.0,
+      "visual_prompt": "Maya standing on the Martian surface, looking out at the hidden ocean, with a sense of hope and wonder",
+      "dialogue": [
+        {
+          "id": "line_5",
+          "character_id": "char_1",
+          "text": "I'll do what's right.",
+          "emotion": "Hope",
+          "direction": "Whispering to herself, looking out at the ocean",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 4,
+      "style": "Realistic",
+      "camera": "Wide shot, panning out to show the vast landscape",
+      "motion": "Slow and sweeping",
+      "bgm_mood": "Hope",
+      "bgm_style": "Orchestral",
+      "character_ids": [
+        "char_1"
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char_1",
+      "name": "Maya",
+      "role": "Protagonist",
+      "description": "A determined and curious young astronaut",
+      "voice": {
+        "style": "Calm and collected",
+        "gender": "Female",
+        "age": "25",
+        "accent": "Neutral",
+        "model": "Standard",
+        "params": {}
+      },
+      "visual": {
+        "description": "Wearing a sleek white spacesuit with a gold visor",
+        "style": "Realistic",
+        "palette": [
+          "white",
+          "gold",
+          "black"
+        ],
+        "references": [
+          "NASA astronaut suits"
+        ]
+      }
+    },
+    {
+      "id": "char_2",
+      "name": "Mission Control",
+      "role": "Supporting",
+      "description": "The voice of authority and guidance",
+      "voice": {
+        "style": "Professional and reassuring",
+        "gender": "Male",
+        "age": "40",
+        "accent": "American",
+        "model": "Standard",
+        "params": {}
+      },
+      "visual": {
+        "description": "A disembodied voice from a communication device",
+        "style": "Minimalistic",
+        "palette": [
+          "gray",
+          "blue"
+        ],
+        "references": [
+          "Space communication devices"
+        ]
+      }
+    }
+  ],
+  "audio": null,
+  "video": null,
+  "edits": null,
+  "phases": {
+    "story": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-01T19:27:44.565216Z",
+      "message": "Story generated",
+      "errors": []
+    },
+    "audio": null,
+    "video": null,
+    "web": null,
+    "edit": null
+  }
+}

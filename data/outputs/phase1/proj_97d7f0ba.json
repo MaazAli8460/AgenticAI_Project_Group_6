@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "project_id": "proj_97d7f0ba",
+    "prompt": "A young astronaut discovers a hidden ocean on Mars and must decide whether to reveal it.",
+    "created_at": "2026-05-01T19:24:07.157756Z",
+    "version": 1,
+    "schema_version": "1.0",
+    "updated_at": "2026-05-01T19:24:07.157756Z",
+    "language": null,
+    "seed": null,
+    "total_duration_s": 25.0,
+    "tags": [
+      "phase1",
+      "story"
+    ]
+  },
+  "story": {
+    "logline": "A young astronaut uncovers a hidden ocean on Mars, sparking a dilemma about revealing the discovery.",
+    "synopsis": "An astronaut finds an ocean on Mars and must decide whether to share the discovery.",
+    "genre": "Science Fiction",
+    "theme": "Responsibility",
+    "tone": "Contemplative",
+    "style": "Realistic",
+    "target_duration_s": 30.0
+  },
+  "scenes": [
+    {
+      "id": "scene_1",
+      "title": "Discovery",
+      "description": "Ava finds the ocean",
+      "setting": "Mars surface",
+      "mood": "Serene",
+      "duration_s": 5.0,
+      "visual_prompt": "Ava standing at the edge of a Martian ocean",
+      "dialogue": [
+        {
+          "id": "line_1",
+          "character_id": "char_1",
+          "text": "It can't be.",
+          "emotion": "Surprise",
+          "direction": "Whispering",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 1,
+      "style": "Realistic",
+      "camera": "Establishing shot",
+      "motion": "Static",
+      "bgm_mood": "Curious",
+      "bgm_style": "Orchestral",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_2",
+      "title": "Dilemma",
+      "description": "Ava considers what to do",
+      "setting": "Ava's spaceship",
+      "mood": "Contemplative",
+      "duration_s": 10.0,
+      "visual_prompt": "Ava sitting in front of a computer screen",
+      "dialogue": [
+        {
+          "id": "line_2",
+          "character_id": "char_1",
+          "text": "Should I report this?",
+          "emotion": "Uncertain",
+          "direction": "Thinking aloud",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 2,
+      "style": "Realistic",
+      "camera": "Close-up",
+      "motion": "Slow zoom",
+      "bgm_mood": "Reflective",
+      "bgm_style": "Piano",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_3",
+      "title": "Decision",
+      "description": "Ava decides to call Mission Control",
+      "setting": "Ava's spaceship",
+      "mood": "Resolute",
+      "duration_s": 10.0,
+      "visual_prompt": "Ava picking up a radio",
+      "dialogue": [
+        {
+          "id": "line_3",
+          "character_id": "char_1",
+          "text": "Mission Control, this is Ava.",
+          "emotion": "Firm",
+          "direction": "Into the radio",
+          "start_ms": null,
+          "end_ms": null
+        },
+        {
+          "id": "line_4",
+          "character_id": "char_2",
+          "text": "Ava, what's your status?",
+          "emotion": "Professional",
+          "direction": "From the radio",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 3,
+      "style": "Realistic",
+      "camera": "Over-the-shoulder",
+      "motion": "Quick cut",
+      "bgm_mood": "Determined",
+      "bgm_style": "Electronic",
+      "character_ids": [
+        "char_1",
+        "char_2"
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char_1",
+      "name": "Ava",
+      "role": "Protagonist",
+      "description": "Young astronaut",
+      "voice": {
+        "style": "Calm",
+        "gender": "Female",
+        "age": "25",
+        "accent": "American",
+        "model": "Google Text-to-Speech",
+        "params": {}
+      },
+      "visual": {
+        "description": "Wearing a spacesuit",
+        "style": "Realistic",
+        "palette": [
+          "white",
+          "silver"
+        ],
+        "references": [
+          "NASA astronaut"
+        ]
+      }
+    },
+    {
+      "id": "char_2",
+      "name": "Mission Control",
+      "role": "Supporting",
+      "description": "Voice from Earth",
+      "voice": {
+        "style": "Professional",
+        "gender": "Male",
+        "age": "40",
+        "accent": "American",
+        "model": "Google Text-to-Speech",
+        "params": {}
+      },
+      "visual": {
+        "description": "Voice from a screen",
+        "style": "Stylized",
+        "palette": [
+          "blue",
+          "white"
+        ],
+        "references": [
+          "NASA control room"
+        ]
+      }
+    }
+  ],
+  "audio": null,
+  "video": null,
+  "edits": null,
+  "phases": {
+    "story": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-01T19:24:07.157756Z",
+      "message": "Story generated",
+      "errors": []
+    },
+    "audio": null,
+    "video": null,
+    "web": null,
+    "edit": null
+  }
+}
