@@ -51,7 +51,17 @@ Create a .env file at the repo root with any required keys. Example:
 ```
 GROQ_API_KEY=
 GROQ_MODEL=llama-3.3-70b-versatile
-TTS_API_KEY=
+TTS_PROVIDER=auto
+TTS_STRICT=0
+TTS_DEBUG=0
+ELEVENLABS_API_KEY=
+ELEVENLABS_VOICE_ID=
+ELEVENLABS_VOICE_ID_FEMALE=
+ELEVENLABS_VOICE_ID_MALE=
+ELEVENLABS_VOICE_ID_NEUTRAL=
+ELEVENLABS_MODEL=eleven_multilingual_v2
+ELEVENLABS_OUTPUT_FORMAT=wav_22050
+BGM_LIBRARY_DIR=
 IMG_API_KEY=
 BGM_API_KEY=
 ```
@@ -68,6 +78,15 @@ python run_phase1.py "A young astronaut discovers a hidden ocean on Mars and mus
 ```
 Outputs are saved to data/outputs/phase1/<project_id>.json. Use --stdout to also print JSON.
 
+Phase 2 can be executed using a Phase 1 JSON output:
+```bash
+python run_phase2.py --input data/outputs/phase1/<project_id>.json
+```
+Audio outputs and the updated state are saved under data/outputs/phase2/<project_id>/.
+
+If ELEVENLABS_VOICE_ID is not set, the TTS tool will fetch your available ElevenLabs voices and
+select one based on character gender, style/tone keywords, accent, and age labels when possible.
+
 ## Testing (Planned)
 - Backend/unit tests: pytest
 - Phase tests: per-agent tests under agents/*/tests
@@ -78,6 +97,7 @@ Completed:
 - Phase 1 story generation with Groq LLM
 - Prompt engineering helper for Phase 1
 - Phase 1 CLI runner with file output
+- Phase 2 audio generation with TTS fallback and timing manifest
 
 In progress:
 - Phase 2 audio generation

@@ -1,0 +1,359 @@
+{
+  "meta": {
+    "project_id": "proj_08cfee14",
+    "prompt": "A young astronaut discovers a hidden ocean on Mars and must decide whether to reveal it.",
+    "created_at": "2026-05-01T20:28:48.751243Z",
+    "version": 1,
+    "schema_version": "1.0",
+    "updated_at": "2026-05-01T20:35:30.521619Z",
+    "language": null,
+    "seed": null,
+    "total_duration_s": 25.0,
+    "tags": [
+      "phase1",
+      "story"
+    ]
+  },
+  "story": {
+    "logline": "A young astronaut's discovery of a hidden ocean on Mars sparks a dilemma between revealing the truth and protecting the planet.",
+    "synopsis": "Astronaut Emma Taylor uncovers a hidden ocean on Mars, forcing her to choose between sharing her findings with the world and preserving the planet's secret.",
+    "genre": "Science Fiction",
+    "theme": "Environmentalism vs. Human Curiosity",
+    "tone": "Contemplative",
+    "style": "Realistic",
+    "target_duration_s": 30.0
+  },
+  "scenes": [
+    {
+      "id": "scene_1",
+      "title": "Discovery",
+      "description": "Emma Taylor stumbles upon a hidden ocean on Mars",
+      "setting": "Mars surface",
+      "mood": "Serene",
+      "duration_s": 5.0,
+      "visual_prompt": "Astronaut standing at the edge of a massive, icy Martian lake",
+      "dialogue": [
+        {
+          "id": "line_1",
+          "character_id": "char_1",
+          "text": "It can't be... an ocean on Mars?",
+          "emotion": "Awe",
+          "direction": "Whispering to herself",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 1,
+      "style": "Realistic",
+      "camera": "Establishing shot",
+      "motion": "Static",
+      "bgm_mood": "Wonder",
+      "bgm_style": "Orchestral",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_2",
+      "title": "Dilemma",
+      "description": "Emma weighs the consequences of revealing her discovery",
+      "setting": "Emma's spaceship",
+      "mood": "Contemplative",
+      "duration_s": 10.0,
+      "visual_prompt": "Astronaut sitting in front of a computer screen displaying images of the Martian ocean",
+      "dialogue": [
+        {
+          "id": "line_2",
+          "character_id": "char_1",
+          "text": "If I share this, it could change everything. But at what cost?",
+          "emotion": "Concern",
+          "direction": "Thinking aloud",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 2,
+      "style": "Realistic",
+      "camera": "Close-up",
+      "motion": "Slow zoom",
+      "bgm_mood": "Introspective",
+      "bgm_style": "Piano",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_3",
+      "title": "Decision",
+      "description": "Emma decides to keep the ocean a secret, for now",
+      "setting": "Emma's spaceship",
+      "mood": "Resolute",
+      "duration_s": 5.0,
+      "visual_prompt": "Astronaut typing on her computer, deleting files",
+      "dialogue": [
+        {
+          "id": "line_3",
+          "character_id": "char_1",
+          "text": "I'll keep this secret, for the sake of Mars.",
+          "emotion": "Firm",
+          "direction": "To herself, with conviction",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 3,
+      "style": "Realistic",
+      "camera": "Over-the-shoulder",
+      "motion": "Quick cut",
+      "bgm_mood": "Determination",
+      "bgm_style": "Electronic",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_4",
+      "title": "Transmission",
+      "description": "Emma sends a misleading report back to Mission Control",
+      "setting": "Emma's spaceship",
+      "mood": "Tense",
+      "duration_s": 5.0,
+      "visual_prompt": "Astronaut speaking into a comms device, with a hint of guilt",
+      "dialogue": [
+        {
+          "id": "line_4",
+          "character_id": "char_1",
+          "text": "Mission Control, this is Emma. My findings indicate no signs of water on Mars.",
+          "emotion": "Neutral",
+          "direction": "Into the comms device",
+          "start_ms": null,
+          "end_ms": null
+        },
+        {
+          "id": "line_5",
+          "character_id": "char_2",
+          "text": "Roger that, Emma. Continue with the mission.",
+          "emotion": "Calm",
+          "direction": "Through the comms device",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 4,
+      "style": "Realistic",
+      "camera": "Close-up",
+      "motion": "Static",
+      "bgm_mood": "Apprehension",
+      "bgm_style": "Minimalist",
+      "character_ids": [
+        "char_1",
+        "char_2"
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char_1",
+      "name": "Emma Taylor",
+      "role": "Protagonist",
+      "description": "A determined and curious young astronaut",
+      "voice": {
+        "style": "Serious",
+        "gender": "Female",
+        "age": "25",
+        "accent": "Neutral",
+        "model": "Standard",
+        "params": {}
+      },
+      "visual": {
+        "description": "Wearing a sleek white spacesuit with a gold visor",
+        "style": "Realistic",
+        "palette": [
+          "white",
+          "gold",
+          "black"
+        ],
+        "references": [
+          "NASA astronaut suits"
+        ]
+      }
+    },
+    {
+      "id": "char_2",
+      "name": "Mission Control",
+      "role": "Supporting",
+      "description": "The voice of authority and guidance",
+      "voice": {
+        "style": "Calm",
+        "gender": "Male",
+        "age": "40",
+        "accent": "American",
+        "model": "Standard",
+        "params": {}
+      },
+      "visual": {
+        "description": "A disembodied voice from a comms device",
+        "style": "Minimalist",
+        "palette": [
+          "gray",
+          "black"
+        ],
+        "references": [
+          "Space mission control rooms"
+        ]
+      }
+    }
+  ],
+  "audio": {
+    "timing_manifest": [
+      {
+        "scene_id": "scene_1",
+        "line_id": "line_1",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_1.wav",
+        "start_ms": 0,
+        "end_ms": 2507,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_2",
+        "line_id": "line_2",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_2.wav",
+        "start_ms": 5200,
+        "end_ms": 9008,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_3",
+        "line_id": "line_3",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_3.wav",
+        "start_ms": 15400,
+        "end_ms": 18139,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_4",
+        "line_id": "line_4",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_4.wav",
+        "start_ms": 20600,
+        "end_ms": 25940,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_4",
+        "line_id": "line_5",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_5.wav",
+        "start_ms": 26140,
+        "end_ms": 28926,
+        "character_id": "char_2"
+      }
+    ],
+    "lines": [
+      {
+        "line_id": "line_1",
+        "scene_id": "scene_1",
+        "character_id": "char_1",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_1.wav",
+        "text": "It can't be... an ocean on Mars?",
+        "start_ms": 0,
+        "end_ms": 2507,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_2",
+        "scene_id": "scene_2",
+        "character_id": "char_1",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_2.wav",
+        "text": "If I share this, it could change everything. But at what cost?",
+        "start_ms": 5200,
+        "end_ms": 9008,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_3",
+        "scene_id": "scene_3",
+        "character_id": "char_1",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_3.wav",
+        "text": "I'll keep this secret, for the sake of Mars.",
+        "start_ms": 15400,
+        "end_ms": 18139,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_4",
+        "scene_id": "scene_4",
+        "character_id": "char_1",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_4.wav",
+        "text": "Mission Control, this is Emma. My findings indicate no signs of water on Mars.",
+        "start_ms": 20600,
+        "end_ms": 25940,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_5",
+        "scene_id": "scene_4",
+        "character_id": "char_2",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\lines\\line_5.wav",
+        "text": "Roger that, Emma. Continue with the mission.",
+        "start_ms": 26140,
+        "end_ms": 28926,
+        "voice_params": {}
+      }
+    ],
+    "bgm_tracks": [
+      {
+        "scene_id": "scene_1",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\bgm\\scene_1_bgm.wav",
+        "start_ms": 0,
+        "end_ms": 5000,
+        "mood": "Wonder",
+        "style": "Orchestral"
+      },
+      {
+        "scene_id": "scene_2",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\bgm\\scene_2_bgm.wav",
+        "start_ms": 5200,
+        "end_ms": 15200,
+        "mood": "Introspective",
+        "style": "Piano"
+      },
+      {
+        "scene_id": "scene_3",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\bgm\\scene_3_bgm.wav",
+        "start_ms": 15400,
+        "end_ms": 20400,
+        "mood": "Determination",
+        "style": "Electronic"
+      },
+      {
+        "scene_id": "scene_4",
+        "audio_file": "data\\outputs\\phase2\\proj_08cfee14\\bgm\\scene_4_bgm.wav",
+        "start_ms": 20600,
+        "end_ms": 28926,
+        "mood": "Apprehension",
+        "style": "Minimalist"
+      }
+    ],
+    "final_audio_file": "data\\outputs\\phase2\\proj_08cfee14\\final\\proj_08cfee14_final.wav"
+  },
+  "video": null,
+  "edits": null,
+  "phases": {
+    "story": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-01T20:28:48.751243Z",
+      "message": "Story generated",
+      "errors": []
+    },
+    "audio": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-01T20:35:30.521619Z",
+      "message": "Audio generated",
+      "errors": []
+    },
+    "video": null,
+    "web": null,
+    "edit": null
+  }
+}
