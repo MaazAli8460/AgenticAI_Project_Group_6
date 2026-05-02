@@ -41,6 +41,8 @@ def generate_silence_samples(duration_ms: int) -> array:
 
 def pad_samples_to_duration(samples: array, target_duration_ms: int) -> array:
     target_samples = int(SAMPLE_RATE * target_duration_ms / 1000)
+    if len(samples) > target_samples:
+        return array("h", samples[:target_samples])
     if len(samples) < target_samples:
         samples.extend([0] * (target_samples - len(samples)))
     return samples
@@ -96,3 +98,22 @@ def mix_samples(
             value = -MAX_INT16
         mixed[i] = value
     return mixed
+
+
+def overlay_samples(
+    base: array,
+    overlay: array,
+    start_index: int,
+    gain: float = 1.0,
+) -> array:
+    if start_index >= len(base):
+        return base
+    end_index = min(len(base), start_index + len(overlay))
+    for idx in range(start_index, end_index):
+        value = base[idx] + int(overlay[idx - start_index] * gain)
+        if value > MAX_INT16:
+            value = MAX_INT16
+        elif value < -MAX_INT16:
+            value = -MAX_INT16
+        base[idx] = value
+    return base

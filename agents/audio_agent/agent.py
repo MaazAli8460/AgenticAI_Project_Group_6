@@ -1,12 +1,20 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import os
 from pathlib import Path
 from typing import Optional
 
 from mcp.tools.audio_tools.audio_merger import AudioMerger
-from mcp.tools.audio_tools.audio_utils import generate_silence_samples, write_wav
+from mcp.tools.audio_tools.audio_utils import (
+	SAMPLE_RATE,
+	generate_silence_samples,
+	overlay_samples,
+	read_wav,
+	write_wav,
+)
 from mcp.tools.audio_tools.bgm_tool import BgmTool
+from shared.constants.bgm_moods import normalize_bgm_mood
 from mcp.tools.audio_tools.tts_tool import TtsTool
 from shared.schemas.state import (
 	AudioLine,
@@ -31,6 +39,8 @@ class AudioAgent:
 		self._bgm = bgm_tool or BgmTool()
 		self._merger = audio_merger or AudioMerger()
 		self._gap_ms = gap_ms
+		self._bgm_gain = float(os.getenv("BGM_GAIN", "0.2"))
+		self._dialogue_gain = float(os.getenv("DIALOGUE_GAIN", "0.9"))
 
 	def generate(self, state: PipelineState, output_dir: Path) -> PipelineState:
 		if not state.scenes:
@@ -55,6 +65,7 @@ class AudioAgent:
 		scenes = sorted(state.scenes, key=lambda item: item.order or 0)
 		for scene in scenes:
 			scene_line_paths: list[Path] = []
+			line_items: list[tuple[Path, int]] = []
 			scene_start_ms = current_ms
 			last_line_end = scene_start_ms
 
@@ -91,7 +102,7 @@ class AudioAgent:
 
 				last_line_end = end_ms
 				current_ms = end_ms + self._gap_ms
-				scene_line_paths.append(line_path)
+				line_items.append((line_path, start_ms - scene_start_ms))
 
 			scene_duration_ms = max(
 				int(scene.duration_s * 1000),
@@ -101,21 +112,18 @@ class AudioAgent:
 				scene_duration_ms = 1000
 
 			dialogue_path = scenes_dir / f"{scene.id}_dialogue.wav"
-			if scene_line_paths:
-				self._merger.concatenate(
-					scene_line_paths,
-					dialogue_path,
-					gap_ms=self._gap_ms,
-					target_duration_ms=scene_duration_ms,
-				)
-			else:
-				samples = generate_silence_samples(scene_duration_ms)
-				write_wav(dialogue_path, samples)
+			dialogue_samples = generate_silence_samples(scene_duration_ms)
+			for line_path, offset_ms in line_items:
+				_, line_samples = read_wav(line_path)
+				offset_index = int(SAMPLE_RATE * offset_ms / 1000)
+				overlay_samples(dialogue_samples, line_samples, offset_index)
+			write_wav(dialogue_path, dialogue_samples)
 
 			bgm_path = bgm_dir / f"{scene.id}_bgm.wav"
+			mood_key = normalize_bgm_mood(scene.bgm_mood or scene.mood)
 			self._bgm.generate(
 				scene.id,
-				scene.bgm_mood or scene.mood,
+				mood_key,
 				scene_duration_ms,
 				bgm_path,
 			)
@@ -125,6 +133,8 @@ class AudioAgent:
 				dialogue_path,
 				bgm_path,
 				mix_path,
+				gain_dialogue=self._dialogue_gain,
+				gain_bgm=self._bgm_gain,
 				target_duration_ms=scene_duration_ms,
 			)
 			scene_mix_paths.append(mix_path)
@@ -136,7 +146,7 @@ class AudioAgent:
 					audio_file=str(bgm_path),
 					start_ms=scene_start_ms,
 					end_ms=scene_end_ms,
-					mood=scene.bgm_mood or scene.mood,
+					mood=mood_key,
 					style=scene.bgm_style,
 				)
 			)

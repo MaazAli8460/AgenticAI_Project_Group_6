@@ -62,6 +62,11 @@ ELEVENLABS_VOICE_ID_NEUTRAL=
 ELEVENLABS_MODEL=eleven_multilingual_v2
 ELEVENLABS_OUTPUT_FORMAT=wav_22050
 BGM_LIBRARY_DIR=
+BGM_GAIN=0.2
+DIALOGUE_GAIN=0.9
+BGM_DEBUG=0
+BGM_STRICT=0
+BGM_START_OFFSET_S=20
 IMG_API_KEY=
 BGM_API_KEY=
 ```
@@ -87,6 +92,17 @@ Audio outputs and the updated state are saved under data/outputs/phase2/<project
 If ELEVENLABS_VOICE_ID is not set, the TTS tool will fetch your available ElevenLabs voices and
 select one based on character gender, style/tone keywords, accent, and age labels when possible.
 
+BGM_LIBRARY_DIR can point to a folder that contains mood-named subfolders. The current supported
+moods are: agressive, atmospheric, carefree, confident, disturbing, dramatic, eerie, fun, happy,
+holiday, hopefull, mysterious, nightmarish, party, proud, relaxed, romantic, sad, scary, sensual,
+sexy, smooth, triumphant, upbeat, uplifting, urban, weird, young.
+The BGM library can contain .wav, .mp3, .m4a, .flac, or .ogg files. Non-wav formats require FFmpeg
+to convert to WAV for mixing.
+Set BGM_DEBUG=1 to log which BGM track is selected per scene. Set BGM_STRICT=1 to fail if BGM
+conversion is not possible.
+BGM_START_OFFSET_S trims the first N seconds from each BGM track before mixing.
+BGM is layered under the full dialogue timeline per scene (background layer = BGM, foreground = dialogue).
+
 ## Testing (Planned)
 - Backend/unit tests: pytest
 - Phase tests: per-agent tests under agents/*/tests
@@ -97,16 +113,14 @@ Completed:
 - Phase 1 story generation with Groq LLM
 - Prompt engineering helper for Phase 1
 - Phase 1 CLI runner with file output
-- Phase 2 audio generation with TTS fallback and timing manifest
+- Phase 2 audio generation with timing manifest, BGM layering, and file output
 
 In progress:
-- Phase 2 audio generation
 - Phase 3 video composition
 - Phase 4 web interface
 - Phase 5 edit agent and undo
 
 ## Next Steps
-1. Phase 2: build TTS pipeline and timing manifest writer.
-2. Phase 3: add image generation + FFmpeg compositing.
-3. Phase 4: create FastAPI endpoints + React UI for orchestration.
-4. Phase 5: implement intent classifier, edit executor, and state history.
+1. Phase 3: add image generation + FFmpeg compositing.
+2. Phase 4: create FastAPI endpoints + React UI for orchestration.
+3. Phase 5: implement intent classifier, edit executor, and state history.

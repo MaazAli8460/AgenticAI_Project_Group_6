@@ -20,6 +20,7 @@ from shared.schemas.state import (
     Scene,
     Story,
 )
+from shared.constants.bgm_moods import BGM_MOODS, normalize_bgm_mood
 
 from .prompt_engineer import build_phase1_prompt
 
@@ -137,12 +138,14 @@ class StoryPlanner:
             "character_ids[], dialogue[]}\n"
             "dialogue: array of {id, character_id, text, emotion, direction}\n"
         )
+        mood_list = ", ".join(BGM_MOODS)
         rules = (
             "Rules:\n"
             "- 3 to 6 scenes, total duration 15-45 seconds.\n"
             "- 2 to 4 characters.\n"
             "- Use short ids like char_1, scene_1, line_1.\n"
             "- Ensure dialogue character_id references a character id.\n"
+            f"- Set bgm_mood using only this list: {mood_list}.\n"
             "- Keep text concise for a short animated film.\n"
         )
         engineered_prompt = build_phase1_prompt(prompt)
@@ -181,6 +184,8 @@ class StoryPlanner:
                 scene.visual_prompt = f"{prompt_seed}. Cinematic wide shot."
             if not scene.dialogue:
                 scene.dialogue = []
+
+            scene.bgm_mood = normalize_bgm_mood(scene.bgm_mood or scene.mood)
 
             referenced_ids: list[str] = []
             scene.character_ids = [
