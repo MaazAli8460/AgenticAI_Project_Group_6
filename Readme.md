@@ -91,6 +91,8 @@ Audio outputs and the updated state are saved under data/outputs/phase2/<project
 
 If ELEVENLABS_VOICE_ID is not set, the TTS tool will fetch your available ElevenLabs voices and
 select one based on character gender, style/tone keywords, accent, and age labels when possible.
+Note: this requires an ElevenLabs API key with voices_read permission. If your key does not
+include voices_read, set ELEVENLABS_VOICE_ID_FEMALE/MALE/NEUTRAL explicitly.
 
 BGM_LIBRARY_DIR can point to a folder that contains mood-named subfolders. The current supported
 moods are: agressive, atmospheric, carefree, confident, disturbing, dramatic, eerie, fun, happy,

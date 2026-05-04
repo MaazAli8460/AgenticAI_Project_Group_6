@@ -64,9 +64,19 @@ class TtsTool:
 		if self._can_use_elevenlabs():
 			voice_id = self._resolve_voice_id(voice)
 			if voice_id:
+				self._maybe_warn(f"Using ElevenLabs voice_id={voice_id}")
 				try:
 					return self._synthesize_elevenlabs(text, voice, output_path, voice_id)
 				except Exception as exc:
+					if "404" in str(exc):
+						self._maybe_warn("Voice id not found; refreshing voice list and retrying.")
+						self._refresh_voice_catalog()
+						retry_id = self._resolve_voice_id(voice, exclude_ids={voice_id})
+						if retry_id:
+							self._maybe_warn(f"Retrying with voice_id={retry_id}")
+							return self._synthesize_elevenlabs(
+								text, voice, output_path, retry_id
+							)
 					self._maybe_warn(f"ElevenLabs TTS failed: {exc}")
 					if self._provider == "elevenlabs" or self._strict:
 						raise
@@ -74,6 +84,7 @@ class TtsTool:
 				self._maybe_warn("ElevenLabs voice_id could not be resolved; using fallback.")
 				if self._provider == "elevenlabs" or self._strict:
 					raise RuntimeError("ElevenLabs voice_id resolution failed.")
+		self._maybe_warn("Falling back to tone synthesis.")
 		return self._synthesize_tone(text, voice, output_path)
 
 	def _can_use_elevenlabs(self) -> bool:
@@ -123,37 +134,47 @@ class TtsTool:
 		write_wav(output_path, samples)
 		return duration_ms
 
-	def _resolve_voice_id(self, voice: VoiceProfile) -> Optional[str]:
+	def _resolve_voice_id(
+		self, voice: VoiceProfile, exclude_ids: Optional[set[str]] = None
+	) -> Optional[str]:
 		params = voice.params or {}
 		override = params.get("voice_id") or params.get("voiceId")
 		if isinstance(override, str) and override:
-			return override
+			return self._clean_voice_id(override, exclude_ids)
 
 		name_override = params.get("voice_name") or params.get("voiceName")
 		if isinstance(name_override, str) and name_override:
 			by_name = self._pick_voice_id_by_name(name_override)
 			if by_name:
-				return by_name
+				return self._clean_voice_id(by_name, exclude_ids)
 
 		gender = self._normalize_gender(voice.gender)
 		cache_key = self._cache_key(voice, gender)
 		if cache_key in self._voice_cache:
-			return self._voice_cache[cache_key]
+			cached = self._clean_voice_id(self._voice_cache[cache_key], exclude_ids)
+			if cached:
+				return cached
 		if gender and self._voice_id_by_gender.get(gender):
 			voice_id = self._voice_id_by_gender[gender]
 			if voice_id:
-				self._voice_cache[cache_key] = voice_id
-				return voice_id
+				cleaned = self._clean_voice_id(voice_id, exclude_ids)
+				if cleaned:
+					self._voice_cache[cache_key] = cleaned
+					return cleaned
 
 		voice_id = self._pick_voice_id_by_profile(voice)
 		if voice_id:
-			self._voice_cache[cache_key] = voice_id
-			return voice_id
+			cleaned = self._clean_voice_id(voice_id, exclude_ids)
+			if cleaned:
+				self._voice_cache[cache_key] = cleaned
+				return cleaned
 
 		if self._voice_id_default:
-			return self._voice_id_default
+			cleaned = self._clean_voice_id(self._voice_id_default, exclude_ids)
+			if cleaned:
+				return cleaned
 
-		return self._pick_any_voice_id()
+		return self._clean_voice_id(self._pick_any_voice_id(), exclude_ids)
 
 	def _pick_voice_id_by_name(self, name: str) -> Optional[str]:
 		voices = self._fetch_voices()
@@ -193,7 +214,6 @@ class TtsTool:
 				best_score = score
 				best_voice_id = voice_id
 		return best_voice_id
-		return None
 
 	def _pick_any_voice_id(self) -> Optional[str]:
 		voices = self._fetch_voices()
@@ -219,11 +239,19 @@ class TtsTool:
 		self._voice_catalog = voices if isinstance(voices, list) else []
 		return self._voice_catalog
 
+	def _refresh_voice_catalog(self) -> None:
+		self._voice_catalog = None
+		self._voice_cache.clear()
+		try:
+			self._fetch_voices()
+		except RuntimeError:
+			pass
+
 	@staticmethod
 	def _extract_voice_id(voice: dict[str, object]) -> Optional[str]:
 		voice_id = voice.get("voice_id") or voice.get("voiceId")
 		if isinstance(voice_id, str) and voice_id:
-			return voice_id
+			return voice_id.strip()
 		return None
 
 	def _score_voice(
@@ -312,6 +340,17 @@ class TtsTool:
 		age = self._normalize_text(voice.age) or ""
 		gender_key = gender or ""
 		return f"{gender_key}|{style}|{accent}|{age}"
+
+	@staticmethod
+	def _clean_voice_id(value: Optional[str], exclude_ids: Optional[set[str]]) -> Optional[str]:
+		if not value:
+			return None
+		cleaned = value.strip()
+		if not cleaned:
+			return None
+		if exclude_ids and cleaned in exclude_ids:
+			return None
+		return cleaned
 
 	@staticmethod
 	def _voice_frequency(voice: VoiceProfile) -> float:
