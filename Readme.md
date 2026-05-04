@@ -67,6 +67,15 @@ DIALOGUE_GAIN=0.9
 BGM_DEBUG=0
 BGM_STRICT=0
 BGM_START_OFFSET_S=20
+BGM_RANDOM_SEED=
+IMAGE_PROVIDER=pollinations
+POLLINATIONS_BASE_URL=https://image.pollinations.ai
+POLLINATIONS_MODEL=
+IMAGE_SEED=
+VIDEO_RESOLUTION=1280x720
+VIDEO_FPS=24
+VIDEO_EFFECT=zoom_in
+SUBTITLES_ENABLED=1
 IMG_API_KEY=
 BGM_API_KEY=
 ```
@@ -89,6 +98,19 @@ python run_phase2.py --input data/outputs/phase1/<project_id>.json
 ```
 Audio outputs and the updated state are saved under data/outputs/phase2/<project_id>/.
 
+Phase 3 can be executed using a Phase 2 JSON output:
+```bash
+python run_phase3.py --input data/outputs/phase2/<project_id>/state.json
+```
+Video outputs and the updated state are saved under data/outputs/phase3/<project_id>/.
+
+Phase 3 behavior:
+- Scene segments are created only on speaker changes (no fixed splitting).
+- Single-speaker scenes render as one continuous clip.
+- Per-speaker images are generated and stitched per segment.
+- Dialogue speaker images are prompted as camera-facing, photorealistic portraits
+	with sharp focus to support lip-sync.
+
 If ELEVENLABS_VOICE_ID is not set, the TTS tool will fetch your available ElevenLabs voices and
 select one based on character gender, style/tone keywords, accent, and age labels when possible.
 Note: this requires an ElevenLabs API key with voices_read permission. If your key does not
@@ -103,7 +125,15 @@ to convert to WAV for mixing.
 Set BGM_DEBUG=1 to log which BGM track is selected per scene. Set BGM_STRICT=1 to fail if BGM
 conversion is not possible.
 BGM_START_OFFSET_S trims the first N seconds from each BGM track before mixing.
+BGM tracks are selected randomly per mood without repeats until the pool is exhausted. Set
+BGM_RANDOM_SEED for deterministic selection.
 BGM is layered under the full dialogue timeline per scene (background layer = BGM, foreground = dialogue).
+
+IMAGE_PROVIDER controls which image generator to use. Supported values are pollinations.
+POLLINATIONS_BASE_URL and POLLINATIONS_MODEL configure Pollinations.
+VIDEO_RESOLUTION, VIDEO_FPS, and VIDEO_EFFECT control clip rendering. SUBTITLES_ENABLED toggles SRT burn-in.
+Dialogue speaker images are prompted as camera-facing, photorealistic portraits with sharp focus to
+support lip-sync.
 
 ## Testing (Planned)
 - Backend/unit tests: pytest
@@ -116,13 +146,12 @@ Completed:
 - Prompt engineering helper for Phase 1
 - Phase 1 CLI runner with file output
 - Phase 2 audio generation with timing manifest, BGM layering, and file output
+- Phase 3 video generation with per-scene assets and final MP4
 
 In progress:
-- Phase 3 video composition
 - Phase 4 web interface
 - Phase 5 edit agent and undo
 
 ## Next Steps
-1. Phase 3: add image generation + FFmpeg compositing.
-2. Phase 4: create FastAPI endpoints + React UI for orchestration.
-3. Phase 5: implement intent classifier, edit executor, and state history.
+1. Phase 4: create FastAPI endpoints + React UI for orchestration.
+2. Phase 5: implement intent classifier, edit executor, and state history.

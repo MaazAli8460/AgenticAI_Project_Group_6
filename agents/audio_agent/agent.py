@@ -61,20 +61,20 @@ class AudioAgent:
 		bgm_tracks: list[BgmTrack] = []
 		scene_mix_paths: list[Path] = []
 
-		current_ms = 0
+		timeline_ms = 0
 		scenes = sorted(state.scenes, key=lambda item: item.order or 0)
 		for scene in scenes:
-			scene_line_paths: list[Path] = []
 			line_items: list[tuple[Path, int]] = []
-			scene_start_ms = current_ms
-			last_line_end = scene_start_ms
+			scene_start_ms = timeline_ms
+			scene_local_ms = 0
+			last_line_end_local = 0
 
 			for line_index, line in enumerate(scene.dialogue, start=1):
 				character = character_map.get(line.character_id, state.characters[0])
 				file_name = line.id or f"line_{scene.id}_{line_index}"
 				line_path = lines_dir / f"{file_name}.wav"
 				duration_ms = self._tts.synthesize(line.text, character.voice, line_path)
-				start_ms = current_ms
+				start_ms = scene_start_ms + scene_local_ms
 				end_ms = start_ms + duration_ms
 
 				timing_manifest.append(
@@ -100,13 +100,16 @@ class AudioAgent:
 					)
 				)
 
-				last_line_end = end_ms
-				current_ms = end_ms + self._gap_ms
+				last_line_end_local = scene_local_ms + duration_ms
+				scene_local_ms = scene_local_ms + duration_ms + self._gap_ms
 				line_items.append((line_path, start_ms - scene_start_ms))
+
+			if line_items:
+				scene_local_ms = max(scene_local_ms - self._gap_ms, 0)
 
 			scene_duration_ms = max(
 				int(scene.duration_s * 1000),
-				int(last_line_end - scene_start_ms),
+				int(last_line_end_local),
 			)
 			if scene_duration_ms <= 0:
 				scene_duration_ms = 1000
@@ -150,7 +153,7 @@ class AudioAgent:
 					style=scene.bgm_style,
 				)
 			)
-			current_ms = max(current_ms, scene_end_ms + self._gap_ms)
+			timeline_ms = scene_end_ms
 
 		final_audio_path = final_dir / f"{state.meta.project_id}_final.wav"
 		self._merger.concatenate(scene_mix_paths, final_audio_path, gap_ms=0)

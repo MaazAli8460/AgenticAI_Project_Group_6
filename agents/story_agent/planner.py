@@ -147,6 +147,9 @@ class StoryPlanner:
             "- Ensure dialogue character_id references a character id.\n"
             f"- Set bgm_mood using only this list: {mood_list}.\n"
             "- Keep text concise for a short animated film.\n"
+            "- Every character must have voice.gender set to male, female, or neutral.\n"
+            "- Visual descriptions must match voice.gender.\n"
+            "- Each scene dialogue ends with a clear concluding line; avoid trailing ellipses.\n"
         )
         engineered_prompt = build_phase1_prompt(prompt)
         return [
@@ -170,6 +173,15 @@ class StoryPlanner:
             new_id = self._unique_id(new_id, used_ids)
             character_ids[char.id] = new_id
             char.id = new_id
+            char.voice.gender = self._normalize_gender(char.voice.gender)
+            if not char.voice.gender:
+                char.voice.gender = self._infer_gender_from_text(
+                    f"{char.description} {char.visual.description}"
+                )
+            if char.voice.gender:
+                char.visual.description = self._align_visual_gender(
+                    char.visual.description, char.voice.gender
+                )
             used_ids.add(new_id)
 
         if not output.characters:
@@ -201,6 +213,10 @@ class StoryPlanner:
                 else:
                     line.character_id = output.characters[0].id
                 referenced_ids.append(line.character_id)
+            if scene.dialogue:
+                last_line = scene.dialogue[-1]
+                if last_line.text:
+                    last_line.text = self._ensure_conclusion(last_line.text)
 
             if not scene.character_ids:
                 scene.character_ids = referenced_ids
@@ -217,6 +233,55 @@ class StoryPlanner:
             output.story.synopsis = f"A short animated tale inspired by: {prompt_seed}."
 
         return output
+
+    @staticmethod
+    def _ensure_conclusion(text: str) -> str:
+        trimmed = text.rstrip()
+        if trimmed.endswith("..."):
+            trimmed = trimmed[:-3].rstrip()
+        if not trimmed.endswith((".", "!", "?")):
+            trimmed = f"{trimmed}."
+        return trimmed
+
+    @staticmethod
+    def _normalize_gender(value: Optional[str]) -> Optional[str]:
+        if not value:
+            return None
+        slug = value.strip().lower()
+        if slug in {"male", "man", "boy", "masculine", "m"}:
+            return "male"
+        if slug in {"female", "woman", "girl", "feminine", "f"}:
+            return "female"
+        if slug in {"neutral", "nonbinary", "non-binary", "androgynous"}:
+            return "neutral"
+        return None
+
+    @staticmethod
+    def _infer_gender_from_text(text: str) -> Optional[str]:
+        lowered = text.lower()
+        if re.search(r"\b(man|male|boy|masculine)\b", lowered):
+            return "male"
+        if re.search(r"\b(woman|female|girl|feminine)\b", lowered):
+            return "female"
+        if re.search(r"\b(nonbinary|non-binary|androgynous|neutral)\b", lowered):
+            return "neutral"
+        return None
+
+    @staticmethod
+    def _align_visual_gender(description: str, gender: str) -> str:
+        if not description:
+            return description
+        updated = description
+        if gender == "male":
+            updated = re.sub(r"\b(woman|female|girl|lady)\b", "man", updated, flags=re.I)
+        elif gender == "female":
+            updated = re.sub(r"\b(man|male|boy|gentleman)\b", "woman", updated, flags=re.I)
+        elif gender == "neutral":
+            if not re.search(r"\b(androgynous|neutral|nonbinary|non-binary)\b", updated, flags=re.I):
+                updated = f"androgynous {updated}"
+        if not re.search(r"\b(male|female|man|woman|boy|girl|androgynous|neutral|nonbinary|non-binary)\b", updated, flags=re.I):
+            updated = f"{gender} {updated}"
+        return updated
 
     @staticmethod
     def _sanitize_id(value: str, prefix: str, index: int) -> str:

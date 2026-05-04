@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import random
 import shutil
 import subprocess
 import sys
@@ -26,11 +27,14 @@ class BgmTool:
 	def __init__(self, library_dir: Optional[Path] = None) -> None:
 		env_dir = os.getenv("BGM_LIBRARY_DIR")
 		self._library_dir = Path(env_dir) if env_dir else library_dir
-		self._source_cache: dict[str, Path] = {}
+		self._source_cycle: dict[str, list[Path]] = {}
+		self._source_index: dict[str, int] = {}
 		self._ffmpeg = shutil.which("ffmpeg")
 		self._debug = os.getenv("BGM_DEBUG", "").lower() in {"1", "true", "yes"}
 		self._strict = os.getenv("BGM_STRICT", "").lower() in {"1", "true", "yes"}
 		self._start_offset_s = float(os.getenv("BGM_START_OFFSET_S", "20"))
+		seed_value = os.getenv("BGM_RANDOM_SEED")
+		self._rng = random.Random(int(seed_value)) if seed_value else random.Random()
 
 	def generate(
 		self,
@@ -61,8 +65,6 @@ class BgmTool:
 		return output_path
 
 	def _pick_library_track(self, mood: str) -> Optional[Path]:
-		if mood in self._source_cache:
-			return self._source_cache[mood]
 		if not self._library_dir or not self._library_dir.exists():
 			return None
 		mood_dir = self._library_dir / mood
@@ -81,8 +83,19 @@ class BgmTool:
 		)
 		if not candidates:
 			return None
-		self._source_cache[mood] = candidates[0]
-		return candidates[0]
+		cycle = self._source_cycle.get(mood)
+		index = self._source_index.get(mood, 0)
+		if not cycle:
+			cycle = candidates
+			self._rng.shuffle(cycle)
+			index = 0
+		if index >= len(cycle):
+			self._rng.shuffle(cycle)
+			index = 0
+		track = cycle[index]
+		self._source_cycle[mood] = cycle
+		self._source_index[mood] = index + 1
+		return track
 
 	def _convert_to_wav(self, source: Path, output_path: Path, duration_ms: int) -> bool:
 		if not self._ffmpeg:

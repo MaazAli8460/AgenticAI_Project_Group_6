@@ -1,0 +1,36 @@
+{
+  "scene_1": {
+    "speaker_prompts": {
+      "char_1": {
+        "prompt": "Astronaut standing on Mars surface with a massive ocean in the background, Hopeful, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
+        "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_1_char_1.png"
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720"
+  },
+  "scene_2": {
+    "speaker_prompts": {
+      "char_1": {
+        "prompt": "Astronaut looking at a Martian creature, Contemplative, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
+        "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_2_char_1.png"
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720"
+  },
+  "scene_3": {
+    "speaker_prompts": {
+      "char_2": {
+        "prompt": "Astronaut transmitting data back to Earth, Determined, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a male character named Mission Control speaking, Male face on a screen",
+        "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_3_char_2.png"
+      },
+      "char_1": {
+        "prompt": "Astronaut transmitting data back to Earth, Determined, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
+        "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_3_char_1.png"
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720"
+  }
+}
