@@ -55,6 +55,11 @@ class VideoAgent:
 		self._subtitles_enabled = subtitles if subtitles is not None else os.getenv(
 			"SUBTITLES_ENABLED", "1"
 		).lower() not in {"0", "false", "no"}
+		self._subtitles_debug = os.getenv("SUBTITLES_DEBUG", "0").lower() in {
+			"1",
+			"true",
+			"yes",
+		}
 		self._seed = os.getenv("IMAGE_SEED")
 
 		self._lip_sync = lip_sync_tool if lip_sync_tool is not None else Wav2LipTool()
@@ -204,8 +209,16 @@ class VideoAgent:
 			subtitle_path = subtitles_dir / f"{state.meta.project_id}.srt"
 			self._subtitles.build_srt(entries, subtitle_path)
 			burned_path = final_dir / f"{state.meta.project_id}_subtitled.mp4"
-			self._compositor.burn_subtitles(final_video_path, subtitle_path, burned_path)
-			final_video_path = burned_path
+			try:
+				self._compositor.burn_subtitles(
+					final_video_path,
+					subtitle_path,
+					burned_path,
+				)
+				final_video_path = burned_path
+			except Exception as exc:
+				if self._subtitles_debug:
+					print(f"[subtitles] burn failed: {exc}", flush=True)
 
 		prompt_path = project_root / "prompts.json"
 		prompt_path.write_text(json.dumps(prompt_manifest, indent=2), encoding="utf-8")

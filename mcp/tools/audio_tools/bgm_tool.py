@@ -10,6 +10,8 @@ from typing import Optional
 
 from shared.constants.bgm_moods import BGM_DEFAULT_MOOD, normalize_bgm_mood
 
+from mcp.tools.video_tools.ffmpeg_tool import resolve_ffmpeg_executable
+
 from .audio_utils import generate_tone_samples, write_wav
 
 
@@ -29,7 +31,7 @@ class BgmTool:
 		self._library_dir = Path(env_dir) if env_dir else library_dir
 		self._source_cycle: dict[str, list[Path]] = {}
 		self._source_index: dict[str, int] = {}
-		self._ffmpeg = shutil.which("ffmpeg")
+		self._ffmpeg = resolve_ffmpeg_executable()
 		self._debug = os.getenv("BGM_DEBUG", "").lower() in {"1", "true", "yes"}
 		self._strict = os.getenv("BGM_STRICT", "").lower() in {"1", "true", "yes"}
 		self._start_offset_s = float(os.getenv("BGM_START_OFFSET_S", "20"))
