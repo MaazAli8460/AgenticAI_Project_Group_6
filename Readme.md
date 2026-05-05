@@ -115,6 +115,12 @@ python run_phase3.py --input data/outputs/phase2/<project_id>/state.json
 ```
 Video outputs and the updated state are saved under data/outputs/phase3/<project_id>/.
 
+Phase 5 (Edit Agent & Undo System) can be executed interactively:
+```bash
+python run_phase5.py --project-id <project_id>
+```
+The agent supports conversational intent classification, `/undo` version control, and granular re-runs via asset caching. When making edits, it actively manages the pipeline by deleting targeted cached assets (images, BGM, lip-syncs) so that underlying phase scripts automatically re-render only the modified aspects.
+
 Phase 3 behavior:
 - Scene segments are created only on speaker changes (no fixed splitting).
 - Single-speaker scenes render as one continuous clip.
@@ -126,6 +132,9 @@ If ELEVENLABS_VOICE_ID is not set, the TTS tool will fetch your available Eleven
 select one based on character gender, style/tone keywords, accent, and age labels when possible.
 Note: this requires an ElevenLabs API key with voices_read permission. If your key does not
 include voices_read, set ELEVENLABS_VOICE_ID_FEMALE/MALE/NEUTRAL explicitly.
+
+**Important Note for Free Tier ElevenLabs Users:**
+If you are using a VPN, a proxy, or have multiple free accounts associated with your IP address, ElevenLabs will instantly flag your key and throw a `401 Unauthorized: Unusual activity detected.` error. If you encounter this, either use a clean IP or bypass ElevenLabs by setting `TTS_PROVIDER=none` in your `.env` to fallback to an offline synthetic tone generator.
 
 BGM_LIBRARY_DIR can point to a folder that contains mood-named subfolders. The current supported
 moods are: agressive, atmospheric, carefree, confident, disturbing, dramatic, eerie, fun, happy,
@@ -234,6 +243,7 @@ Completed:
 - Phase 5 edit agent and undo (Module 2: Intent Classification)
 - Phase 5 edit agent and undo (Module 3/4: MCP Tools & LangGraph Orchestrator)
 - Phase 5 CLI interactive editor (`run_phase5.py`)
+- Phase 5 Contextual Memory and Targeted Granular Re-runs
 
 In progress:
 - Phase 4 web interface

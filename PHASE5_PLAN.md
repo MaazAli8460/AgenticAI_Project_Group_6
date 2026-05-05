@@ -1,4 +1,6 @@
-# Phase 5 Implementation Plan: Intelligent Edit & Undo System
+# Phase 5 Implementation Plan: Intelligent Edit & Undo System (COMPLETED)
+
+**STATUS: DONE** - The Phase 5 HITL conversational edit system has been fully implemented and verified!
 
 This document outlines the architecture, breakdown, and implementation plan for Phase 5 of the Agentic AI Project. It incorporates LangGraph, Human-In-The-Loop (HITL), Model Context Protocol (MCP) servers, and a robust State Versioning/Undo system.
 
@@ -78,8 +80,13 @@ We will use **LangGraph** to manage the conversational and execution flow, utili
 ---
 
 ## Execution Order
-1. Setup dependencies (`langgraph`, `langchain-groq`, `mcp`).
-2. Build **Module 1** (State Manager) first, as every edit depends on saving state.
-3. Build **Module 2** (Intent Classifier) and write the 10 test cases.
-4. Build **Module 3** (Execution Logic) to allow partial pipeline runs.
-5. Build **Module 4 & 5** (LangGraph & Interface) to tie everything together.
+1. ~~Setup dependencies (`langgraph`, `langchain-groq`, `mcp`).~~ (DONE)
+2. ~~Build **Module 1** (State Manager) first, as every edit depends on saving state.~~ (DONE)
+3. ~~Build **Module 2** (Intent Classifier) and write the 10 test cases.~~ (DONE)
+4. ~~Build **Module 3** (Execution Logic) to allow partial pipeline runs.~~ (DONE - Implemented targeted asset deletion and universal state sync).
+5. ~~Build **Module 4 & 5** (LangGraph & Interface) to tie everything together.~~ (DONE - Implemented conversational wrapper `get_project_context` and CLI `run_phase5.py`).
+
+## Implementation Notes & Handoff Instructions
+- **Conversational Awareness**: The LangGraph agent uses `get_project_context` to actively resolve ambiguity before overwriting traits.
+- **Granular Reruns**: Editing characters or BGM triggers a selective deletion of matching cached assets (e.g., `scene_1_char_1.png`). When Phase 2/3 restarts, it automatically skips existing unmodified files and re-renders only what is missing.
+- **ElevenLabs Free Tier Issue**: Free tier ElevenLabs accounts trigger a `401 Unauthorized` if multiple accounts/requests originate from proxies or VPNs. A fallback bypass using `TTS_PROVIDER=none` can be used to generate synthetic tones offline instead of crashing.
