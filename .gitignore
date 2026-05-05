@@ -33,6 +33,9 @@ dist/
 data/temp/
 data/state_versions/
 
+# Third-party tools and large model weights (Wav2Lip, etc.)
+third_party/
+
 # OS files
 .DS_Store
 Thumbs.db

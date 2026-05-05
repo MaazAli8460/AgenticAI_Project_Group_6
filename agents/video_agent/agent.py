@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import json
 import os
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+from mcp.tools.audio_tools.audio_utils import build_segment_audio
 from mcp.tools.video_tools.compositor_tool import CompositorTool
 from mcp.tools.video_tools.ffmpeg_tool import FfmpegTool
 from mcp.tools.video_tools.subtitle_tool import SubtitleTool
+from mcp.tools.video_tools.wav2lip_tool import Wav2LipError, Wav2LipTool
 from mcp.tools.vision_tools.image_gen_tool import ImageGenTool
 from shared.schemas.state import (
 	PhaseStatus,
@@ -19,6 +22,14 @@ from shared.schemas.state import (
 )
 
 
+@dataclass
+class _SceneSegment:
+	image_path: Path
+	duration_ms: int
+	speaker_id: Optional[str] = None
+	line_audio_paths: list[tuple[Path, int]] = field(default_factory=list)
+
+
 class VideoAgent:
 	def __init__(
 		self,
@@ -26,10 +37,13 @@ class VideoAgent:
 		ffmpeg_tool: Optional[FfmpegTool] = None,
 		compositor_tool: Optional[CompositorTool] = None,
 		subtitle_tool: Optional[SubtitleTool] = None,
+		lip_sync_tool: Optional[Wav2LipTool] = None,
 		resolution: Optional[str] = None,
 		fps: Optional[int] = None,
 		effect: Optional[str] = None,
 		subtitles: Optional[bool] = None,
+		lip_sync_enabled: Optional[bool] = None,
+		lip_sync_strict: Optional[bool] = None,
 	) -> None:
 		self._image_tool = image_tool or ImageGenTool()
 		self._ffmpeg = ffmpeg_tool or FfmpegTool()
@@ -42,6 +56,35 @@ class VideoAgent:
 			"SUBTITLES_ENABLED", "1"
 		).lower() not in {"0", "false", "no"}
 		self._seed = os.getenv("IMAGE_SEED")
+
+		self._lip_sync = lip_sync_tool if lip_sync_tool is not None else Wav2LipTool()
+		requested_enabled = (
+			lip_sync_enabled
+			if lip_sync_enabled is not None
+			else os.getenv("LIP_SYNC_ENABLED", "0").lower() not in {"0", "false", "no"}
+		)
+		self._lip_sync_strict = (
+			lip_sync_strict
+			if lip_sync_strict is not None
+			else os.getenv("LIP_SYNC_STRICT", "0").lower() in {"1", "true", "yes"}
+		)
+		self._lip_sync_debug = os.getenv("LIP_SYNC_DEBUG", "0").lower() in {
+			"1",
+			"true",
+			"yes",
+		}
+		# Auto-disable when configuration is missing unless strict mode is set.
+		availability = self._lip_sync.availability_reason()
+		if requested_enabled and availability is not None and not self._lip_sync_strict:
+			if self._lip_sync_debug:
+				print(
+					f"[lip-sync] disabling lip-sync: {availability}",
+					flush=True,
+				)
+			requested_enabled = False
+		elif requested_enabled and availability is not None and self._lip_sync_strict:
+			raise RuntimeError(f"Lip-sync is enabled but Wav2Lip is unavailable: {availability}")
+		self._lip_sync_enabled = requested_enabled
 
 	def generate(self, state: PipelineState, output_dir: Path) -> PipelineState:
 		if not state.scenes:
@@ -59,6 +102,7 @@ class VideoAgent:
 		clips_dir = project_root / "clips"
 		final_dir = project_root / "final"
 		subtitles_dir = project_root / "subtitles"
+		lip_sync_dir = project_root / "lip_sync"
 
 		scene_assets: list[SceneAsset] = []
 		clips: list[Path] = []
@@ -91,18 +135,39 @@ class VideoAgent:
 				scene_entries,
 			)
 			segment_clips: list[Path] = []
-			for index, (image_path, duration_ms) in enumerate(segments, start=1):
-				clip_path = clips_dir / f"{scene.id}_seg_{index}.mp4"
+			lip_sync_log: list[dict[str, object]] = []
+			for index, segment in enumerate(segments, start=1):
+				duration_s = max(segment.duration_ms / 1000.0, 0.1)
+				raw_clip_path = clips_dir / f"{scene.id}_seg_{index}_raw.mp4"
 				self._ffmpeg.image_to_clip(
-					image_path,
-					clip_path,
-					max(duration_ms / 1000.0, 0.1),
+					segment.image_path,
+					raw_clip_path,
+					duration_s,
 					width,
 					height,
 					self._fps,
 					effect=self._effect,
 				)
-				segment_clips.append(clip_path)
+				final_segment_path = clips_dir / f"{scene.id}_seg_{index}.mp4"
+				lip_sync_status = self._maybe_lip_sync_segment(
+					segment,
+					raw_clip_path,
+					final_segment_path,
+					lip_sync_dir,
+					scene.id,
+					index,
+					width,
+					height,
+				)
+				if lip_sync_status is None:
+					# No lip-sync attempted (disabled or no dialogue): use raw clip directly.
+					if final_segment_path != raw_clip_path:
+						if final_segment_path.exists():
+							final_segment_path.unlink()
+						raw_clip_path.replace(final_segment_path)
+				else:
+					lip_sync_log.append(lip_sync_status)
+				segment_clips.append(final_segment_path)
 
 			scene_clip_path = clips_dir / f"{scene.id}.mp4"
 			self._compositor.concat(segment_clips, scene_clip_path)
@@ -120,6 +185,8 @@ class VideoAgent:
 				"speaker_prompts": speaker_prompts,
 				"effect": self._effect,
 				"resolution": f"{width}x{height}",
+				"lip_sync_enabled": self._lip_sync_enabled,
+				"lip_sync_segments": lip_sync_log,
 			}
 
 		final_dir.mkdir(parents=True, exist_ok=True)
@@ -159,6 +226,107 @@ class VideoAgent:
 		)
 
 		return state
+
+	def _maybe_lip_sync_segment(
+		self,
+		segment: _SceneSegment,
+		raw_clip_path: Path,
+		final_segment_path: Path,
+		lip_sync_dir: Path,
+		scene_id: str,
+		index: int,
+		width: int,
+		height: int,
+	) -> Optional[dict[str, object]]:
+		"""Run Wav2Lip on a single segment, returning a status entry or None.
+
+		Returns ``None`` when lip-sync is skipped (disabled or no dialogue),
+		signalling the caller to use the raw clip as the final segment clip.
+		On Wav2Lip failure with strict=False, falls back to the raw clip and
+		returns a status entry with ``"status": "fallback"``.
+		"""
+		if not self._lip_sync_enabled or not segment.line_audio_paths:
+			return None
+
+		lip_sync_dir.mkdir(parents=True, exist_ok=True)
+		segment_audio_path = lip_sync_dir / f"{scene_id}_seg_{index}_dialogue.wav"
+		try:
+			build_segment_audio(
+				segment.line_audio_paths,
+				segment.duration_ms,
+				segment_audio_path,
+			)
+		except Exception as exc:
+			if self._lip_sync_strict:
+				raise
+			if self._lip_sync_debug:
+				print(
+					f"[lip-sync] segment {scene_id}#{index}: failed to build audio: {exc}",
+					flush=True,
+				)
+			return {
+				"segment": index,
+				"status": "fallback",
+				"reason": f"audio build failed: {exc}",
+			}
+
+		lip_synced_path = lip_sync_dir / f"{scene_id}_seg_{index}_synced.mp4"
+		try:
+			self._lip_sync.lip_sync(
+				raw_clip_path,
+				segment_audio_path,
+				lip_synced_path,
+			)
+		except Wav2LipError as exc:
+			if self._lip_sync_strict:
+				raise
+			if self._lip_sync_debug:
+				print(
+					f"[lip-sync] segment {scene_id}#{index}: wav2lip failed, falling back: {exc}",
+					flush=True,
+				)
+			return {
+				"segment": index,
+				"status": "fallback",
+				"reason": str(exc).splitlines()[0] if str(exc) else "wav2lip error",
+			}
+
+		try:
+			self._ffmpeg.normalize_clip(
+				lip_synced_path,
+				final_segment_path,
+				width,
+				height,
+				self._fps,
+			)
+		except Exception as exc:
+			if self._lip_sync_strict:
+				raise
+			if self._lip_sync_debug:
+				print(
+					f"[lip-sync] segment {scene_id}#{index}: normalize failed, falling back: {exc}",
+					flush=True,
+				)
+			return {
+				"segment": index,
+				"status": "fallback",
+				"reason": f"normalize failed: {exc}",
+			}
+
+		if self._lip_sync_debug:
+			print(
+				f"[lip-sync] segment {scene_id}#{index}: lip-synced "
+				f"({segment.speaker_id or 'unknown'})",
+				flush=True,
+			)
+		return {
+			"segment": index,
+			"status": "lip_synced",
+			"speaker_id": segment.speaker_id,
+			"audio_file": str(segment_audio_path),
+			"raw_clip": str(raw_clip_path),
+			"synced_clip": str(lip_synced_path),
+		}
 
 	@staticmethod
 	def _parse_resolution(value: str) -> tuple[int, int]:
@@ -266,59 +434,93 @@ class VideoAgent:
 		line_map: dict,
 		speaker_images: dict[str, Path],
 		scene_entries: list,
-	) -> list[tuple[Path, int]]:
+	) -> list[_SceneSegment]:
 		entries = sorted(scene_entries, key=lambda entry: entry.start_ms)
 		fallback_image = next(iter(speaker_images.values()))
 
 		if not entries:
 			fallback_duration = int(self._scene_duration_s(scene.id, state) * 1000)
-			return [(fallback_image, fallback_duration)]
+			return [
+				_SceneSegment(
+					image_path=fallback_image,
+					duration_ms=fallback_duration,
+				)
+			]
 
-		segments: list[tuple[Path, int]] = []
-		current_speaker: Optional[str] = None
+		segments: list[_SceneSegment] = []
+		current: Optional[_SceneSegment] = None
 		current_start: Optional[int] = None
 		current_end: Optional[int] = None
-		current_image: Optional[Path] = None
+
+		def _close_segment(end_ms: Optional[int]) -> None:
+			nonlocal current, current_start, current_end
+			if current is None or current_start is None:
+				return
+			final_end = end_ms if end_ms is not None else current_end
+			if final_end is None:
+				final_end = current_start
+			current.duration_ms = max(int(final_end) - int(current_start), 100)
+			segments.append(current)
+			current = None
+			current_start = None
+			current_end = None
 
 		for entry in entries:
 			line = line_map.get(entry.line_id)
 			speaker_id = line.character_id if line else entry.character_id
 			if not speaker_id:
-				speaker_id = current_speaker or next(iter(speaker_images.keys()), None)
-			image_path = speaker_images.get(speaker_id, fallback_image)
-			if current_speaker is None:
-				current_speaker = speaker_id
+				speaker_id = (
+					current.speaker_id
+					if current is not None
+					else next(iter(speaker_images.keys()), None)
+				)
+			image_path = speaker_images.get(speaker_id, fallback_image) if speaker_id else fallback_image
+			audio_file = Path(entry.audio_file) if entry.audio_file else None
+
+			if current is None:
+				current = _SceneSegment(
+					image_path=image_path,
+					duration_ms=0,
+					speaker_id=speaker_id,
+				)
 				current_start = entry.start_ms
 				current_end = entry.end_ms
-				current_image = image_path
-				continue
-			if speaker_id == current_speaker:
-				current_end = max(current_end or entry.end_ms, entry.end_ms)
+				if audio_file is not None:
+					current.line_audio_paths.append(
+						(audio_file, entry.start_ms - (current_start or 0))
+					)
 				continue
 
+			if speaker_id == current.speaker_id:
+				current_end = max(current_end or entry.end_ms, entry.end_ms)
+				if audio_file is not None and current_start is not None:
+					current.line_audio_paths.append(
+						(audio_file, entry.start_ms - current_start)
+					)
+				continue
+
+			# Speaker change: close out the running segment and start a new one.
 			segment_end = max(current_end or entry.start_ms, entry.start_ms)
-			segments.append(
-				(current_image or fallback_image, max(segment_end - (current_start or 0), 100))
+			_close_segment(segment_end)
+			current = _SceneSegment(
+				image_path=image_path,
+				duration_ms=0,
+				speaker_id=speaker_id,
 			)
-			current_speaker = speaker_id
 			current_start = entry.start_ms
 			current_end = entry.end_ms
-			current_image = image_path
+			if audio_file is not None:
+				current.line_audio_paths.append((audio_file, 0))
 
-		if current_start is not None and current_end is not None:
-			segments.append(
-				(current_image or fallback_image, max(current_end - current_start, 100))
-			)
+		_close_segment(current_end)
 
 		target_ms = int(self._scene_duration_s(scene.id, state) * 1000)
-		current_ms = sum(segment[1] for segment in segments)
+		current_ms = sum(seg.duration_ms for seg in segments)
 		if current_ms < target_ms and segments:
-			image_path, duration_ms = segments[-1]
-			segments[-1] = (image_path, duration_ms + (target_ms - current_ms))
+			segments[-1].duration_ms += target_ms - current_ms
 		elif current_ms > target_ms and segments:
 			excess = current_ms - target_ms
-			image_path, duration_ms = segments[-1]
-			segments[-1] = (image_path, max(duration_ms - excess, 100))
+			segments[-1].duration_ms = max(segments[-1].duration_ms - excess, 100)
 		return segments
 
 	@staticmethod

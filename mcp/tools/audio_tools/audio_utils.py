@@ -117,3 +117,24 @@ def overlay_samples(
             value = -MAX_INT16
         base[idx] = value
     return base
+
+
+def build_segment_audio(
+    line_files_with_offsets: Iterable[tuple[Path, int]],
+    segment_duration_ms: int,
+    output_path: Path,
+) -> Path:
+    """Render a single WAV that overlays per-line audios at their offsets.
+
+    Used by the video agent to build the clean dialogue track for a single
+    speaker segment, which is then fed to a lip-sync model alongside the
+    matching speaker portrait clip.
+    """
+    duration_ms = max(int(segment_duration_ms), 0)
+    base = generate_silence_samples(duration_ms)
+    for line_file, offset_ms in line_files_with_offsets:
+        _, line_samples = read_wav(line_file)
+        offset_index = int(SAMPLE_RATE * max(int(offset_ms), 0) / 1000)
+        overlay_samples(base, line_samples, offset_index)
+    write_wav(output_path, base)
+    return output_path

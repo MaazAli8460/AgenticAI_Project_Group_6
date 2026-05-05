@@ -1,15 +1,63 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
 
 
+def _find_ffmpeg_via_winget_windows() -> Path | None:
+	"""Locate ffmpeg.exe installed by WinGet (PATH is often stale until shell restart)."""
+	local = os.environ.get("LOCALAPPDATA")
+	if not local:
+		return None
+	packages = Path(local) / "Microsoft" / "WinGet" / "Packages"
+	if not packages.is_dir():
+		return None
+	# e.g. .../Gyan.FFmpeg_.../ffmpeg-8.1.1-full_build/bin/ffmpeg.exe
+	candidates: list[Path] = []
+	for pkg_root in packages.iterdir():
+		if "ffmpeg" not in pkg_root.name.lower():
+			continue
+		for exe in pkg_root.rglob("ffmpeg.exe"):
+			if "bin" in exe.parts:
+				candidates.append(exe)
+	if not candidates:
+		return None
+	return max(candidates, key=lambda p: p.stat().st_mtime)
+
+
+def resolve_ffmpeg_executable(explicit: str | Path | None = None) -> str | None:
+	"""Return an ffmpeg executable path, or None if none found.
+
+	Order: explicit arg, ``FFMPEG_PATH`` env, ``FFMPEG`` env, ``PATH`` (``which``),
+	then WinGet default layout on Windows.
+	"""
+	if explicit:
+		p = Path(explicit)
+		if p.is_file():
+			return str(p.resolve())
+	if env := (os.getenv("FFMPEG_PATH") or os.getenv("FFMPEG") or "").strip():
+		p = Path(env)
+		if p.is_file():
+			return str(p.resolve())
+	found = shutil.which("ffmpeg")
+	if found:
+		return found
+	wg = _find_ffmpeg_via_winget_windows()
+	return str(wg.resolve()) if wg and wg.is_file() else None
+
+
 class FfmpegTool:
 	def __init__(self, ffmpeg_path: str | None = None) -> None:
-		self._ffmpeg = ffmpeg_path or shutil.which("ffmpeg")
+		self._ffmpeg = resolve_ffmpeg_executable(ffmpeg_path)
 		if not self._ffmpeg:
-			raise RuntimeError("FFmpeg is required for Phase 3 video rendering.")
+			raise RuntimeError(
+				"FFmpeg is required for Phase 3 video rendering. Install it and ensure "
+				"it is on PATH, or set FFMPEG_PATH to the full path of ffmpeg.exe "
+				'(e.g. after `winget install Gyan.FFmpeg`, restart the terminal or set '
+				"FFMPEG_PATH to ...\\WinGet\\Packages\\...\\bin\\ffmpeg.exe)."
+			)
 
 	def image_to_clip(
 		self,
@@ -88,6 +136,39 @@ class FfmpegTool:
 			"-c:a",
 			"aac",
 			"-shortest",
+			str(output_path),
+		]
+		self._run(cmd)
+		return output_path
+
+	def normalize_clip(
+		self,
+		input_path: Path,
+		output_path: Path,
+		width: int,
+		height: int,
+		fps: int,
+	) -> Path:
+		"""Re-encode a clip to a uniform spec (h264, yuv420p, scale, fps, no audio).
+
+		Used after lip-sync passes (which may emit non-h264 or differently sized
+		MP4s) so all segment clips are mutually concat-compatible.
+		"""
+		output_path.parent.mkdir(parents=True, exist_ok=True)
+		if not input_path.exists():
+			raise RuntimeError(f"Input clip missing: {input_path}")
+		cmd = [
+			self._ffmpeg,
+			"-y",
+			"-i",
+			str(input_path),
+			"-vf",
+			f"scale={width}:{height},fps={fps}",
+			"-pix_fmt",
+			"yuv420p",
+			"-c:v",
+			"libx264",
+			"-an",
 			str(output_path),
 		]
 		self._run(cmd)

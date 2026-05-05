@@ -27,7 +27,7 @@ Required top-level fields: meta, story, scenes, characters. Later phases append 
 ## Setup
 Prerequisites:
 - Python 3.10+ and Node.js 18+
-- FFmpeg installed and on PATH
+- FFmpeg installed (normally on `PATH`; if your terminal was open before `winget install Gyan.FFmpeg`, restart it or set `FFMPEG_PATH` to `ffmpeg.exe`. On Windows the project also auto-detects WinGet’s `…\WinGet\Packages\…\bin\ffmpeg.exe`.)
 - API keys or local models for LLM, TTS, and image generation
 
 Backend environment:
@@ -78,6 +78,17 @@ VIDEO_EFFECT=zoom_in
 SUBTITLES_ENABLED=1
 IMG_API_KEY=
 BGM_API_KEY=
+LIP_SYNC_ENABLED=0
+LIP_SYNC_STRICT=0
+LIP_SYNC_DEBUG=0
+WAV2LIP_DIR=
+WAV2LIP_CHECKPOINT=
+WAV2LIP_PYTHON=
+WAV2LIP_PADS=0,10,0,0
+WAV2LIP_RESIZE_FACTOR=1
+WAV2LIP_NOSMOOTH=0
+WAV2LIP_BATCH_SIZE=128
+WAV2LIP_FACE_DET_BATCH_SIZE=16
 ```
 
 ## Run (Planned)
@@ -134,6 +145,77 @@ POLLINATIONS_BASE_URL and POLLINATIONS_MODEL configure Pollinations.
 VIDEO_RESOLUTION, VIDEO_FPS, and VIDEO_EFFECT control clip rendering. SUBTITLES_ENABLED toggles SRT burn-in.
 Dialogue speaker images are prompted as camera-facing, photorealistic portraits with sharp focus to
 support lip-sync.
+
+## Lip-sync with Wav2Lip (optional)
+Phase 3 can drive Wav2Lip to lip-sync each speaker segment against its dialogue audio.
+The integration runs Wav2Lip per segment (one speaker at a time), then concatenates the
+synced clips and muxes the full mixed audio (dialogue + BGM) at the end. Lip-sync is
+applied only to segments that have dialogue; non-speaking fallback segments are passed
+through unchanged.
+
+Setup (one-time):
+The upstream Wav2Lip repo gitignores its own model weights, and its pinned dependencies
+target Python 3.7 / torch 1.1.0. The project includes an automated setup script that
+clones the repo, downloads the model weights from public Hugging Face mirrors (with
+SHA-256 verification), patches Wav2Lip's `audio.py` / `inference.py` /
+`face_detection/detection/sfd/sfd_detector.py` for compatibility with modern PyTorch
+(>=2.6), librosa (>=0.10), and numpy (>=2), and writes the required keys into your
+`.env`:
+```bash
+python scripts/setup_wav2lip.py --install-deps
+```
+This:
+1. Clones https://github.com/Rudrabha/Wav2Lip into `third_party/Wav2Lip/`
+   (`third_party/` is gitignored).
+2. Downloads `wav2lip_gan.pth` (~436 MB) and `s3fd.pth` (~90 MB) into the right
+   subdirectories of `third_party/Wav2Lip/`.
+3. Applies idempotent patches (re-runs are safe).
+4. Pip-installs `librosa` (the only Wav2Lip dep that's not already present in a
+   typical PyTorch install). Drop `--install-deps` if you want to manage that
+   yourself or use a separate venv.
+5. Adds `LIP_SYNC_ENABLED=1`, `WAV2LIP_DIR`, and `WAV2LIP_CHECKPOINT` to `.env`
+   (creating it from `.example.env` if needed).
+
+Other Wav2Lip dependencies (torch, torchvision, opencv-python, numpy, numba, scipy,
+tqdm) are normally already installed alongside PyTorch. If any are missing, install
+them into the same Python environment as this project, or set up a dedicated venv
+and point at it via `WAV2LIP_PYTHON` in `.env`.
+
+You also need ffmpeg on `PATH` (the rest of Phase 3 already requires it). On Windows:
+```powershell
+winget install Gyan.FFmpeg
+# restart the shell so the PATH update is picked up
+```
+
+Configure (auto-set by the setup script, shown here for reference):
+```
+LIP_SYNC_ENABLED=1
+WAV2LIP_DIR=<repo>/third_party/Wav2Lip
+WAV2LIP_CHECKPOINT=<repo>/third_party/Wav2Lip/checkpoints/wav2lip_gan.pth
+WAV2LIP_PYTHON=                  # leave empty to reuse this project's interpreter
+# Optional tuning:
+WAV2LIP_PADS=0,10,0,0
+WAV2LIP_RESIZE_FACTOR=1
+WAV2LIP_NOSMOOTH=0
+WAV2LIP_BATCH_SIZE=128
+WAV2LIP_FACE_DET_BATCH_SIZE=16
+LIP_SYNC_STRICT=0
+LIP_SYNC_DEBUG=0
+```
+
+Behavior:
+- If `LIP_SYNC_ENABLED=1` but `WAV2LIP_DIR` / `WAV2LIP_CHECKPOINT` are missing or
+	invalid, Phase 3 disables lip-sync and renders normally. Set `LIP_SYNC_STRICT=1`
+	to fail loudly instead.
+- If Wav2Lip fails on a single segment (face not detected, etc.), that segment falls
+	back to the raw image clip while other segments still get lip-synced. Set
+	`LIP_SYNC_STRICT=1` to abort the run instead.
+- Set `LIP_SYNC_DEBUG=1` to log per-segment lip-sync decisions and the underlying
+	Wav2Lip command.
+- Per-scene metadata about which segments were lip-synced (or fell back, with reason)
+	is written to `data/outputs/phase3/<project_id>/prompts.json` under each scene's
+	`lip_sync_segments` entry. Intermediate files (segment dialogue WAV, raw clip, and
+	Wav2Lip output) are kept under `data/outputs/phase3/<project_id>/lip_sync/`.
 
 ## Testing (Planned)
 - Backend/unit tests: pytest
