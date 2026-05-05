@@ -36,6 +36,7 @@ export default function App() {
   const [editReply, setEditReply] = useState("");
   const [editHistory, setEditHistory] = useState([]);
   const [editBusy, setEditBusy] = useState(false);
+  const [editThread, setEditThread] = useState([]);
 
   const videoUrl = useMemo(() => {
     if (!projectId) return "";
@@ -195,17 +196,37 @@ export default function App() {
       alert("Set a project ID first.");
       return;
     }
-    if (!editMessage.trim()) {
+    const outgoing = editMessage.trim();
+    if (!outgoing) {
       alert("Enter an edit request.");
       return;
     }
     setEditBusy(true);
+    setEditThread((prev) => [
+      { role: "user", text: outgoing, time: new Date().toLocaleTimeString() },
+      ...prev,
+    ].slice(0, 8));
     try {
       const result = await postJson(`${API_BASE}/api/edit`, {
         project_id: projectId,
-        message: editMessage,
+        message: outgoing,
       });
       setEditReply(result.reply || "");
+      if (result.reply) {
+        setEditThread((prev) => [
+          { role: "agent", text: result.reply, time: new Date().toLocaleTimeString() },
+          ...prev,
+        ].slice(0, 8));
+      }
+      setEvents((prev) => [
+        {
+          message: "Edit agent reply",
+          status: "complete",
+          phase: "edit",
+          phase_status: "complete",
+        },
+        ...prev,
+      ]);
       setEditMessage("");
       fetchHistory(projectId);
     } catch (error) {
@@ -359,7 +380,27 @@ export default function App() {
             </button>
           </div>
           <div className="edit-reply">
+            <div className="edit-reply-header">
+              <span>Latest reply</span>
+              {editBusy && <span className="muted">Working...</span>}
+            </div>
             {editReply ? <p>{editReply}</p> : <p className="muted">No edit response yet.</p>}
+          </div>
+          <div className="edit-thread">
+            <div className="edit-reply-header">
+              <span>Chat log</span>
+              <span className="muted">Last 8</span>
+            </div>
+            {editThread.length === 0 && <p className="muted">No messages yet.</p>}
+            {editThread.map((item, index) => (
+              <div key={`${item.role}-${index}`} className={`edit-bubble ${item.role}`}>
+                <div className="edit-meta">
+                  <span className="edit-role">{item.role === "user" ? "You" : "Agent"}</span>
+                  <span className="edit-time">{item.time}</span>
+                </div>
+                <p>{item.text}</p>
+              </div>
+            ))}
           </div>
         </section>
 

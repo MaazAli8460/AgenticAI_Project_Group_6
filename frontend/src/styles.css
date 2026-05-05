@@ -240,6 +240,68 @@ button:disabled {
   padding: 1rem;
   margin-top: 1rem;
   min-height: 80px;
+  color: #0f172a;
+}
+
+.edit-reply .muted {
+  color: #64748b;
+}
+
+.edit-reply-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  color: #0f172a;
+}
+
+.edit-thread {
+  margin-top: 1.5rem;
+  background: #0c0f16;
+  border-radius: 16px;
+  border: 1px solid rgba(246, 243, 238, 0.08);
+  padding: 1rem;
+}
+
+.edit-thread .edit-reply-header {
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.edit-bubble {
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.75rem;
+  background: rgba(246, 243, 238, 0.06);
+  border: 1px solid rgba(246, 243, 238, 0.08);
+}
+
+.edit-bubble.user {
+  background: rgba(244, 185, 69, 0.12);
+  border-color: rgba(244, 185, 69, 0.3);
+}
+
+.edit-bubble.agent {
+  background: rgba(93, 208, 167, 0.12);
+  border-color: rgba(93, 208, 167, 0.28);
+}
+
+.edit-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.edit-bubble p {
+  margin: 0;
 }
 
 .events {

@@ -28,6 +28,7 @@ class _SceneSegment:
 	duration_ms: int
 	speaker_id: Optional[str] = None
 	line_audio_paths: list[tuple[Path, int]] = field(default_factory=list)
+	front_facing: bool = True
 
 
 class VideoAgent:
@@ -123,7 +124,7 @@ class VideoAgent:
 				if entry.scene_id == scene.id
 			]
 			speaker_ids = self._collect_speaker_ids(scene, scene_entries, line_map)
-			speaker_images, speaker_prompts = self._build_speaker_images(
+			speaker_images, speaker_prompts, speaker_front_facing = self._build_speaker_images(
 				scene,
 				characters,
 				images_dir,
@@ -138,6 +139,7 @@ class VideoAgent:
 				line_map,
 				speaker_images,
 				scene_entries,
+				speaker_front_facing,
 			)
 			segment_clips: list[Path] = []
 			lip_sync_log: list[dict[str, object]] = []
@@ -172,6 +174,12 @@ class VideoAgent:
 							final_segment_path.unlink()
 						raw_clip_path.replace(final_segment_path)
 				else:
+					if lip_sync_status.get("status") in {"fallback", "skipped"}:
+						# Lip-sync failed or was skipped: keep the raw clip so concat succeeds.
+						if final_segment_path != raw_clip_path:
+							if final_segment_path.exists():
+								final_segment_path.unlink()
+							raw_clip_path.replace(final_segment_path)
 					lip_sync_log.append(lip_sync_status)
 				segment_clips.append(final_segment_path)
 
@@ -261,6 +269,17 @@ class VideoAgent:
 		"""
 		if not self._lip_sync_enabled or not segment.line_audio_paths:
 			return None
+		if not segment.front_facing:
+			if self._lip_sync_debug:
+				print(
+					f"[lip-sync] segment {scene_id}#{index}: skipped (not front-facing)",
+					flush=True,
+				)
+			return {
+				"segment": index,
+				"status": "skipped",
+				"reason": "not front-facing",
+			}
 
 		lip_sync_dir.mkdir(parents=True, exist_ok=True)
 		segment_audio_path = lip_sync_dir / f"{scene_id}_seg_{index}_dialogue.wav"
@@ -369,13 +388,15 @@ class VideoAgent:
 		if gender_hint:
 			speaking_prompt = (
 				"photorealistic, sharp focus, high detail, no blur, no distortion, "
-				"camera-facing, front-facing close-up portrait of a "
+				"front-facing, looking directly at camera, camera-facing, "
+				"head-on close-up portrait of a "
 				f"{gender_hint} character named {character.name} speaking"
 			)
 		else:
 			speaking_prompt = (
 				"photorealistic, sharp focus, high detail, no blur, no distortion, "
-				"camera-facing, front-facing close-up portrait of "
+				"front-facing, looking directly at camera, camera-facing, "
+				"head-on close-up portrait of "
 				f"{character.name} speaking"
 			)
 		parts = [
@@ -396,12 +417,13 @@ class VideoAgent:
 		height: int,
 		seed: Optional[int],
 		speaker_ids: Optional[list[str]] = None,
-	) -> tuple[dict[str, Path], dict[str, dict[str, str]]]:
+	) -> tuple[dict[str, Path], dict[str, dict[str, str]], dict[str, bool]]:
 		speaker_ids = speaker_ids or []
 		if not speaker_ids:
 			speaker_ids = list(dict.fromkeys(scene.character_ids))
 		speaker_images: dict[str, Path] = {}
 		speaker_prompts: dict[str, dict[str, str]] = {}
+		speaker_front_facing: dict[str, bool] = {}
 		for speaker_id in speaker_ids:
 			character = characters.get(speaker_id)
 			if not character:
@@ -412,22 +434,29 @@ class VideoAgent:
 				self._image_tool.generate(prompt, image_path, width, height, seed=seed)
 			self._validate_image_file(image_path, scene.id)
 			speaker_images[speaker_id] = image_path
+			speaker_front_facing[speaker_id] = self._is_front_facing_prompt(prompt)
 			speaker_prompts[speaker_id] = {
 				"prompt": prompt,
 				"image": str(image_path),
+				"front_facing": speaker_front_facing[speaker_id],
 			}
 		if not speaker_images:
-			fallback_prompt = scene.visual_prompt
+			fallback_prompt = (
+				f"{scene.visual_prompt}, front-facing, looking directly at camera, "
+				"head-on close-up portrait"
+			)
 			fallback_path = images_dir / f"{scene.id}_scene.png"
 			if not fallback_path.exists():
 				self._image_tool.generate(fallback_prompt, fallback_path, width, height, seed=seed)
 			self._validate_image_file(fallback_path, scene.id)
 			speaker_images["scene"] = fallback_path
+			speaker_front_facing["scene"] = self._is_front_facing_prompt(fallback_prompt)
 			speaker_prompts["scene"] = {
 				"prompt": fallback_prompt,
 				"image": str(fallback_path),
+				"front_facing": speaker_front_facing["scene"],
 			}
-		return speaker_images, speaker_prompts
+		return speaker_images, speaker_prompts, speaker_front_facing
 
 	def _build_scene_segments(
 		self,
@@ -436,9 +465,11 @@ class VideoAgent:
 		line_map: dict,
 		speaker_images: dict[str, Path],
 		scene_entries: list,
+		speaker_front_facing: dict[str, bool],
 	) -> list[_SceneSegment]:
 		entries = sorted(scene_entries, key=lambda entry: entry.start_ms)
 		fallback_image = next(iter(speaker_images.values()))
+		fallback_front = speaker_front_facing.get("scene")
 
 		if not entries:
 			fallback_duration = int(self._scene_duration_s(scene.id, state) * 1000)
@@ -446,6 +477,7 @@ class VideoAgent:
 				_SceneSegment(
 					image_path=fallback_image,
 					duration_ms=fallback_duration,
+					front_facing=True if fallback_front is None else fallback_front,
 				)
 			]
 
@@ -477,6 +509,10 @@ class VideoAgent:
 					else next(iter(speaker_images.keys()), None)
 				)
 			image_path = speaker_images.get(speaker_id, fallback_image) if speaker_id else fallback_image
+			front_facing = speaker_front_facing.get(
+				speaker_id,
+				True if fallback_front is None else fallback_front,
+			)
 			audio_file = Path(entry.audio_file) if entry.audio_file else None
 
 			if current is None:
@@ -484,6 +520,7 @@ class VideoAgent:
 					image_path=image_path,
 					duration_ms=0,
 					speaker_id=speaker_id,
+					front_facing=front_facing,
 				)
 				current_start = entry.start_ms
 				current_end = entry.end_ms
@@ -508,6 +545,7 @@ class VideoAgent:
 				image_path=image_path,
 				duration_ms=0,
 				speaker_id=speaker_id,
+				front_facing=front_facing,
 			)
 			current_start = entry.start_ms
 			current_end = entry.end_ms
@@ -540,6 +578,32 @@ class VideoAgent:
 		raise RuntimeError(
 			f"Image generation failed for {scene_id}: non-image content received."
 		)
+
+	@staticmethod
+	def _is_front_facing_prompt(prompt: str) -> bool:
+		text = prompt.lower()
+		negative = [
+			"profile",
+			"side view",
+			"side-view",
+			"looking away",
+			"back view",
+			"back-facing",
+			"rear view",
+			"turned away",
+			"three-quarter view",
+			"3/4 view",
+			"over the shoulder",
+		]
+		if any(term in text for term in negative):
+			return False
+		positive = [
+			"front-facing",
+			"camera-facing",
+			"looking directly at camera",
+			"head-on",
+		]
+		return any(term in text for term in positive)
 
 	def _scene_duration_s(self, scene_id: str, state: PipelineState) -> float:
 		if state.audio and state.audio.bgm_tracks:
