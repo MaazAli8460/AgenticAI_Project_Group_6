@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "project_id": "proj_1e4eb465",
+    "prompt": "A female anime character in pakistani setting.",
+    "created_at": "2026-05-05T16:09:14.048507Z",
+    "version": 1,
+    "schema_version": "1.0",
+    "updated_at": "2026-05-05T16:09:14.048507Z",
+    "language": null,
+    "seed": null,
+    "total_duration_s": 25.0,
+    "tags": [
+      "phase1",
+      "story"
+    ]
+  },
+  "story": {
+    "logline": "A young Pakistani girl finds her voice through art",
+    "synopsis": "A girl in a Pakistani setting discovers her passion for art and uses it to express herself",
+    "genre": "Animation, Drama",
+    "theme": "Self-discovery, Empowerment",
+    "tone": "Uplifting, Inspirational",
+    "style": "2D Animation",
+    "target_duration_s": 30.0
+  },
+  "scenes": [
+    {
+      "id": "scene_1",
+      "title": "Introduction",
+      "description": "Ayesha is introduced, sitting at her desk, drawing",
+      "setting": "Ayesha's bedroom",
+      "mood": "Relaxed",
+      "duration_s": 5.0,
+      "visual_prompt": "Ayesha sitting at her desk, drawing, with a window behind her showing a Pakistani cityscape",
+      "dialogue": [
+        {
+          "id": "line_1",
+          "character_id": "char_1",
+          "text": "I love to draw, it's my escape.",
+          "emotion": "Happy",
+          "direction": "Looking down at her paper",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 1,
+      "style": "2D Animation",
+      "camera": "Static",
+      "motion": "None",
+      "bgm_mood": "carefree",
+      "bgm_style": "Acoustic Guitar",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_2",
+      "title": "Discovery",
+      "description": "Ayesha discovers her passion for art",
+      "setting": "Ayesha's bedroom",
+      "mood": "Inspired",
+      "duration_s": 10.0,
+      "visual_prompt": "Ayesha's drawings coming to life, with colors and patterns filling the room",
+      "dialogue": [
+        {
+          "id": "line_2",
+          "character_id": "char_1",
+          "text": "I feel like I can express myself through my art.",
+          "emotion": "Excited",
+          "direction": "Looking up at her drawings",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 2,
+      "style": "2D Animation",
+      "camera": "Pan",
+      "motion": "Slow",
+      "bgm_mood": "upbeat",
+      "bgm_style": "Violin",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_3",
+      "title": "Encouragement",
+      "description": "Ayesha's mother encourages her to pursue her passion",
+      "setting": "Ayesha's living room",
+      "mood": "Supportive",
+      "duration_s": 10.0,
+      "visual_prompt": "Ayesha's mother sitting next to her, looking at her drawings",
+      "dialogue": [
+        {
+          "id": "line_3",
+          "character_id": "char_2",
+          "text": "I'm so proud of you, Ayesha, never give up on your dreams.",
+          "emotion": "Proud",
+          "direction": "Smiling at Ayesha",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 3,
+      "style": "2D Animation",
+      "camera": "Static",
+      "motion": "None",
+      "bgm_mood": "hopefull",
+      "bgm_style": "Piano",
+      "character_ids": [
+        "char_1",
+        "char_2"
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char_1",
+      "name": "Ayesha",
+      "role": "Protagonist",
+      "description": "A young Pakistani girl with a passion for art",
+      "voice": {
+        "style": "Soft",
+        "gender": "female",
+        "age": "16",
+        "accent": "Pakistani",
+        "model": "Google Text-to-Speech",
+        "params": {}
+      },
+      "visual": {
+        "description": "A young girl with long, dark hair and brown eyes, wearing a traditional Pakistani dress",
+        "style": "Anime-inspired",
+        "palette": [
+          "#FFC0CB",
+          "#8B9467",
+          "#6495ED"
+        ],
+        "references": [
+          "Sailor Moon",
+          "Cardcaptor Sakura"
+        ]
+      }
+    },
+    {
+      "id": "char_2",
+      "name": "Mother",
+      "role": "Supporting",
+      "description": "Ayesha's mother, who encourages her to pursue her passion",
+      "voice": {
+        "style": "Warm",
+        "gender": "female",
+        "age": "40",
+        "accent": "Pakistani",
+        "model": "Google Text-to-Speech",
+        "params": {}
+      },
+      "visual": {
+        "description": "A middle-aged woman with short, dark hair and warm smile, wearing a traditional Pakistani dress",
+        "style": "Anime-inspired",
+        "palette": [
+          "#FFC0CB",
+          "#8B9467",
+          "#6495ED"
+        ],
+        "references": [
+          "Sailor Moon",
+          "Cardcaptor Sakura"
+        ]
+      }
+    }
+  ],
+  "audio": null,
+  "video": null,
+  "edits": null,
+  "phases": {
+    "story": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-05T16:09:14.048507Z",
+      "message": "Story generated",
+      "errors": []
+    },
+    "audio": null,
+    "video": null,
+    "web": null,
+    "edit": null
+  }
+}

@@ -1,7 +1,7 @@
 import json
 import subprocess
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from langchain_core.tools import tool
 
@@ -27,6 +27,21 @@ def update_all_states(project_id: str, updater_fn) -> bool:
             except Exception as e:
                 print(f"Error updating state at {p}: {e}")
     return success
+
+
+def get_latest_state_path(project_id: str) -> Path:
+    """Return the most recent state.json for a project across phases."""
+    base_dir = Path("data/outputs")
+    candidates = [
+        base_dir / "phase3_lip_sync" / project_id / "state.json",
+        base_dir / "phase3" / project_id / "state.json",
+        base_dir / "phase2" / project_id / "state.json",
+        base_dir / "phase1" / f"{project_id}.json",
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    raise FileNotFoundError(f"No state.json found for project {project_id}")
 
 
 @tool

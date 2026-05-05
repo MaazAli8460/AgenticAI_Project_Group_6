@@ -76,6 +76,7 @@ VIDEO_RESOLUTION=1280x720
 VIDEO_FPS=24
 VIDEO_EFFECT=zoom_in
 SUBTITLES_ENABLED=1
+FRONTEND_ORIGIN=http://localhost:5173
 IMG_API_KEY=
 BGM_API_KEY=
 LIP_SYNC_ENABLED=0
@@ -91,10 +92,18 @@ WAV2LIP_BATCH_SIZE=128
 WAV2LIP_FACE_DET_BATCH_SIZE=16
 ```
 
-## Run (Planned)
-These commands will be used once the backend and frontend entrypoints are implemented:
-- Backend: uvicorn backend.app:app --reload
-- Frontend: npm run dev (from frontend/)
+## Run (Phase 4 Web UI)
+Start the backend API (Phase 4 orchestration server):
+```bash
+uvicorn backend.app:app --reload
+```
+Start the frontend UI (Vite dev server):
+```bash
+cd frontend
+npm run dev
+```
+The frontend calls the backend via `/api/*` and subscribes to `/api/stream/<project_id>`
+for SSE progress updates. If you host the UI elsewhere, set `FRONTEND_ORIGIN` in `.env`.
 
 ## Run (Current)
 Phase 1 can be executed directly:
@@ -244,9 +253,10 @@ Completed:
 - Phase 5 edit agent and undo (Module 3/4: MCP Tools & LangGraph Orchestrator)
 - Phase 5 CLI interactive editor (`run_phase5.py`)
 - Phase 5 Contextual Memory and Targeted Granular Re-runs
+- Phase 4 web interface (FastAPI + React orchestration UI)
 
 In progress:
-- Phase 4 web interface
+- Report, demo video, and presentation assets
 
 ## Next Steps
-1. Phase 4: Create FastAPI endpoints + React UI for orchestration.
+1. Produce the project report, demo video, and slides for submission.
