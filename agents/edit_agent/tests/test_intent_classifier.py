@@ -71,7 +71,13 @@ TEST_QUERIES = [
 @pytest.mark.parametrize("query, expected_target, expected_scope_hint", TEST_QUERIES)
 def test_intent_classification(classifier, query, expected_target, expected_scope_hint):
     time.sleep(2.0)  # Avoid Groq rate limits
-    intent_obj = classifier.classify(query)
+    try:
+        intent_obj = classifier.classify(query)
+    except RuntimeError as exc:
+        message = str(exc).lower()
+        if "rate limit" in message or "429" in message:
+            pytest.skip("Groq rate limit reached. Skipping intent classifier tests.")
+        raise
     
     # 1. Check if the target is correctly identified
     assert intent_obj.target == expected_target, \

@@ -1,0 +1,404 @@
+{
+  "meta": {
+    "project_id": "proj_a6c6d879",
+    "prompt": "a female anime character in a Pakistani setting",
+    "created_at": "2026-05-05T16:42:24.119341Z",
+    "version": 1,
+    "schema_version": "1.0",
+    "updated_at": "2026-05-05T20:04:03.696367Z",
+    "language": null,
+    "seed": null,
+    "total_duration_s": 25.0,
+    "tags": [
+      "phase1",
+      "story"
+    ]
+  },
+  "story": {
+    "logline": "A young Pakistani girl navigates her way through a vibrant market.",
+    "synopsis": "The film follows a female anime character as she explores a Pakistani setting, discovering the sights and sounds of the culture.",
+    "genre": "Cultural",
+    "theme": "Discovery",
+    "tone": "Carefree",
+    "style": "Vibrant",
+    "target_duration_s": 30.0
+  },
+  "scenes": [
+    {
+      "id": "scene_1",
+      "title": "Introduction to Aisha",
+      "description": "Aisha walks through a crowded market, taking in the sights and sounds.",
+      "setting": "cyberpunk city",
+      "mood": "Vibrant",
+      "duration_s": 5.0,
+      "visual_prompt": "cyberpunk city. Aisha walks through a crowded market, with vendors and customers moving around her.",
+      "dialogue": [
+        {
+          "id": "line_1",
+          "character_id": "char_1",
+          "text": "Wow, I love the smells here!",
+          "emotion": "Excitement",
+          "direction": "To herself",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 1,
+      "style": "Fast-paced",
+      "camera": "Over-the-shoulder",
+      "motion": "Fast-paced cutting",
+      "bgm_mood": "upbeat",
+      "bgm_style": "Traditional Pakistani music",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_2",
+      "title": "Aisha meets the vendor",
+      "description": "Aisha stops at a vendor's stall, admiring the colorful fabrics.",
+      "setting": "Vendor's stall",
+      "mood": "Friendly",
+      "duration_s": 10.0,
+      "visual_prompt": "Aisha stands at the vendor's stall, touching the fabrics and looking up at the vendor with a smile.",
+      "dialogue": [
+        {
+          "id": "line_2",
+          "character_id": "char_2",
+          "text": "Welcome to my stall, young one! What catches your eye?",
+          "emotion": "Friendliness",
+          "direction": "To Aisha",
+          "start_ms": null,
+          "end_ms": null
+        },
+        {
+          "id": "line_3",
+          "character_id": "char_1",
+          "text": "I love the colors! They're so beautiful.",
+          "emotion": "Admiration",
+          "direction": "To the vendor",
+          "start_ms": null,
+          "end_ms": null
+        },
+        {
+          "id": "line_4",
+          "character_id": "char_2",
+          "text": "I'm glad you like them. Maybe you can find something special to take home.",
+          "emotion": "Warmth",
+          "direction": "To Aisha",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 2,
+      "style": "Intimate",
+      "camera": "Medium shot",
+      "motion": "Slow zoom",
+      "bgm_mood": "carefree",
+      "bgm_style": "Acoustic guitar",
+      "character_ids": [
+        "char_1",
+        "char_2"
+      ]
+    },
+    {
+      "id": "scene_3",
+      "title": "Aisha finds a special fabric",
+      "description": "Aisha discovers a unique fabric that catches her eye.",
+      "setting": "Vendor's stall",
+      "mood": "Exciting",
+      "duration_s": 10.0,
+      "visual_prompt": "Aisha holds up a vibrant fabric, with the vendor smiling in the background.",
+      "dialogue": [
+        {
+          "id": "line_5",
+          "character_id": "char_1",
+          "text": "Oh, this one is perfect! Thank you so much!",
+          "emotion": "Gratitude",
+          "direction": "To the vendor",
+          "start_ms": null,
+          "end_ms": null
+        },
+        {
+          "id": "line_6",
+          "character_id": "char_2",
+          "text": "You're welcome, young one. I'm glad you found something special.",
+          "emotion": "Satisfaction",
+          "direction": "To Aisha",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 3,
+      "style": "Dramatic",
+      "camera": "Close-up",
+      "motion": "Slow motion",
+      "bgm_mood": "triumphant",
+      "bgm_style": "Orchestral",
+      "character_ids": [
+        "char_1",
+        "char_2"
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char_1",
+      "name": "Aisha",
+      "role": "Protagonist",
+      "description": "A young Pakistani girl with a curious spirit.",
+      "voice": {
+        "style": "Bright",
+        "gender": "female",
+        "age": "16",
+        "accent": "Pakistani",
+        "model": "Standard",
+        "params": {}
+      },
+      "visual": {
+        "description": "female Aisha has long, dark hair and expressive brown eyes. She wears a traditional shalwar kameez.",
+        "style": "Anime-inspired",
+        "palette": [
+          "#FFC67D",
+          "#8B9467",
+          "#FF99CC"
+        ],
+        "references": [
+          "Pakistani clothing",
+          "Anime-style hair"
+        ]
+      }
+    },
+    {
+      "id": "char_2",
+      "name": "Vendor",
+      "role": "Supporting",
+      "description": "A friendly vendor at the market.",
+      "voice": {
+        "style": "Warm",
+        "gender": "male",
+        "age": "40",
+        "accent": "Pakistani",
+        "model": "Standard",
+        "params": {}
+      },
+      "visual": {
+        "description": "male The vendor has a bushy beard and a kind smile. He is facing forward and wears a traditional kurta.",
+        "style": "Realistic",
+        "palette": [
+          "#663300",
+          "#CC9933",
+          "#FFFFFF"
+        ],
+        "references": [
+          "Pakistani clothing",
+          "Traditional marketplace"
+        ]
+      }
+    }
+  ],
+  "audio": {
+    "timing_manifest": [
+      {
+        "scene_id": "scene_1",
+        "line_id": "line_1",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_1.wav",
+        "start_ms": 0,
+        "end_ms": 1764,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_2",
+        "line_id": "line_2",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_2.wav",
+        "start_ms": 5000,
+        "end_ms": 8482,
+        "character_id": "char_2"
+      },
+      {
+        "scene_id": "scene_2",
+        "line_id": "line_3",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_3.wav",
+        "start_ms": 8682,
+        "end_ms": 11003,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_2",
+        "line_id": "line_4",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_4.wav",
+        "start_ms": 11203,
+        "end_ms": 15429,
+        "character_id": "char_2"
+      },
+      {
+        "scene_id": "scene_3",
+        "line_id": "line_5",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_5.wav",
+        "start_ms": 15429,
+        "end_ms": 17983,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_3",
+        "line_id": "line_6",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_6.wav",
+        "start_ms": 18183,
+        "end_ms": 21480,
+        "character_id": "char_2"
+      }
+    ],
+    "lines": [
+      {
+        "line_id": "line_1",
+        "scene_id": "scene_1",
+        "character_id": "char_1",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_1.wav",
+        "text": "Wow, I love the smells here!",
+        "start_ms": 0,
+        "end_ms": 1764,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_2",
+        "scene_id": "scene_2",
+        "character_id": "char_2",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_2.wav",
+        "text": "Welcome to my stall, young one! What catches your eye?",
+        "start_ms": 5000,
+        "end_ms": 8482,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_3",
+        "scene_id": "scene_2",
+        "character_id": "char_1",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_3.wav",
+        "text": "I love the colors! They're so beautiful.",
+        "start_ms": 8682,
+        "end_ms": 11003,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_4",
+        "scene_id": "scene_2",
+        "character_id": "char_2",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_4.wav",
+        "text": "I'm glad you like them. Maybe you can find something special to take home.",
+        "start_ms": 11203,
+        "end_ms": 15429,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_5",
+        "scene_id": "scene_3",
+        "character_id": "char_1",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_5.wav",
+        "text": "Oh, this one is perfect! Thank you so much!",
+        "start_ms": 15429,
+        "end_ms": 17983,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_6",
+        "scene_id": "scene_3",
+        "character_id": "char_2",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\lines\\line_6.wav",
+        "text": "You're welcome, young one. I'm glad you found something special.",
+        "start_ms": 18183,
+        "end_ms": 21480,
+        "voice_params": {}
+      }
+    ],
+    "bgm_tracks": [
+      {
+        "scene_id": "scene_1",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\bgm\\scene_1_bgm.wav",
+        "start_ms": 0,
+        "end_ms": 5000,
+        "mood": "upbeat",
+        "style": "Traditional Pakistani music"
+      },
+      {
+        "scene_id": "scene_2",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\bgm\\scene_2_bgm.wav",
+        "start_ms": 5000,
+        "end_ms": 15429,
+        "mood": "carefree",
+        "style": "Acoustic guitar"
+      },
+      {
+        "scene_id": "scene_3",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\bgm\\scene_3_bgm.wav",
+        "start_ms": 15429,
+        "end_ms": 25429,
+        "mood": "triumphant",
+        "style": "Orchestral"
+      }
+    ],
+    "final_audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase2\\proj_a6c6d879\\final\\proj_a6c6d879_final.wav"
+  },
+  "video": {
+    "scene_assets": [
+      {
+        "scene_id": "scene_1",
+        "image_files": [
+          "data\\outputs\\phase3\\proj_a6c6d879\\images\\scene_1_char_1.png"
+        ],
+        "clip_file": "data\\outputs\\phase3\\proj_a6c6d879\\clips\\scene_1.mp4",
+        "subtitle_file": null,
+        "transition": null
+      },
+      {
+        "scene_id": "scene_2",
+        "image_files": [
+          "data\\outputs\\phase3\\proj_a6c6d879\\images\\scene_2_char_2.png",
+          "data\\outputs\\phase3\\proj_a6c6d879\\images\\scene_2_char_1.png"
+        ],
+        "clip_file": "data\\outputs\\phase3\\proj_a6c6d879\\clips\\scene_2.mp4",
+        "subtitle_file": null,
+        "transition": null
+      },
+      {
+        "scene_id": "scene_3",
+        "image_files": [
+          "data\\outputs\\phase3\\proj_a6c6d879\\images\\scene_3_char_1.png",
+          "data\\outputs\\phase3\\proj_a6c6d879\\images\\scene_3_char_2.png"
+        ],
+        "clip_file": "data\\outputs\\phase3\\proj_a6c6d879\\clips\\scene_3.mp4",
+        "subtitle_file": null,
+        "transition": null
+      }
+    ],
+    "final_video_file": "data\\outputs\\phase3\\proj_a6c6d879\\final\\proj_a6c6d879_subtitled.mp4",
+    "subtitle_file": "data\\outputs\\phase3\\proj_a6c6d879\\subtitles\\proj_a6c6d879.srt",
+    "resolution": "1280x720",
+    "fps": 24.0
+  },
+  "edits": null,
+  "phases": {
+    "story": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-05T16:42:24.119341Z",
+      "message": "Story generated",
+      "errors": []
+    },
+    "audio": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-05T16:42:36.768111Z",
+      "message": "Audio generated",
+      "errors": []
+    },
+    "video": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-05T20:04:03.696367Z",
+      "message": "Video generated",
+      "errors": []
+    },
+    "web": null,
+    "edit": null
+  }
+}

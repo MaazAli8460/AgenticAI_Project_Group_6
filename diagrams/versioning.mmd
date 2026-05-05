@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant User
+  participant Agent as Edit Agent
+  participant SM as State Manager
+  participant FS as Outputs Folder
+
+  User->>Agent: Submit edit request
+  Agent->>SM: snapshot(v2)
+  SM->>FS: Copy state + assets
+  Agent->>FS: Apply changes + rerun phase
+  Agent->>SM: snapshot(v3)
+  User->>Agent: Undo to v2
+  Agent->>SM: revert(v2)
+  SM->>FS: Restore state + assets

@@ -32,6 +32,7 @@ Core fields:
 - story: full narrative text
 - characters: list of character profiles with name, gender, voice_id, and visual description
 - scenes: list of scene entries with dialogue lines, setting, mood, duration, and per-speaker metadata
+- scenes.character_overrides: optional per-scene visual overrides for targeted edits
 - audio: per-line audio file references and a timing manifest for synchronization
 - visuals: per-scene image prompts, generated image paths, and animation metadata
 - outputs: assembled audio/video artifacts and final MP4 location
@@ -69,6 +70,8 @@ The schema enables:
 - LangGraph-based edit agent interprets natural-language edit commands.
 - Tool routing decides whether to adjust story text, audio parameters, or visuals.
 - A versioned state manager snapshots changes and supports undo via history restoration.
+- Scene-scoped overrides allow targeted edits without re-rendering unrelated scenes.
+- Subtitle toggles switch between pre-rendered videos without re-running Phase 3.
 
 ## Tools and APIs Used
 - LLM: Groq (llama-3.3-70b-versatile)
@@ -84,6 +87,7 @@ The schema enables:
 - Gender consistency: enforced in story generation and visual prompt engineering.
 - Provider reliability: standardized on Pollinations for image generation.
 - Audio mixing balance: tuned BGM and dialogue gain controls with debug mode.
+- Lip-sync resilience: Wav2Lip failures fall back to raw clips without blocking the pipeline.
 - Undo correctness: centralized state snapshots with safe reversion logic.
 
 ## Results

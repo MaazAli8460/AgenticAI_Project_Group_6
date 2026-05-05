@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -166,6 +167,7 @@ class VideoAgent:
 					index,
 					width,
 					height,
+					lip_sync_enabled=None,
 				)
 				if lip_sync_status is None:
 					# No lip-sync attempted (disabled or no dialogue): use raw clip directly.
@@ -249,6 +251,204 @@ class VideoAgent:
 
 		return state
 
+	def generate_scene(
+		self,
+		state: PipelineState,
+		output_dir: Path,
+		scene_id: str,
+		lip_sync_override: Optional[bool] = None,
+	) -> PipelineState:
+		if not state.scenes:
+			raise ValueError("Phase 3 requires at least one scene.")
+		if not state.audio or not state.audio.final_audio_file:
+			raise ValueError("Phase 3 requires Phase 2 audio output.")
+
+		width, height = self._parse_resolution(self._resolution)
+		seed = int(self._seed) if self._seed else None
+
+		project_root = output_dir / state.meta.project_id
+		images_dir = project_root / "images"
+		clips_dir = project_root / "clips"
+		lip_sync_dir = project_root / "lip_sync"
+		prompt_path = project_root / "prompts.json"
+		prompt_manifest: dict[str, dict[str, object]] = {}
+		if prompt_path.exists():
+			prompt_manifest = json.loads(prompt_path.read_text(encoding="utf-8"))
+
+		scene = next((item for item in state.scenes if item.id == scene_id), None)
+		if scene is None:
+			raise ValueError(f"Scene '{scene_id}' not found.")
+
+		characters = {character.id: character for character in state.characters}
+		line_map = {line.line_id: line for line in state.audio.lines}
+		scene_entries = [
+			entry
+			for entry in state.audio.timing_manifest
+			if entry.scene_id == scene.id
+		]
+		speaker_ids = self._collect_speaker_ids(scene, scene_entries, line_map)
+		speaker_images, speaker_prompts, speaker_front_facing = self._build_speaker_images(
+			scene,
+			characters,
+			images_dir,
+			width,
+			height,
+			seed,
+			speaker_ids,
+		)
+		segments = self._build_scene_segments(
+			scene,
+			state,
+			line_map,
+			speaker_images,
+			scene_entries,
+			speaker_front_facing,
+		)
+
+		segment_clips: list[Path] = []
+		lip_sync_log: list[dict[str, object]] = []
+		for index, segment in enumerate(segments, start=1):
+			duration_s = max(segment.duration_ms / 1000.0, 0.1)
+			raw_clip_path = clips_dir / f"{scene.id}_seg_{index}_raw.mp4"
+			raw_clip_path.unlink(missing_ok=True)
+			self._ffmpeg.image_to_clip(
+				segment.image_path,
+				raw_clip_path,
+				duration_s,
+				width,
+				height,
+				self._fps,
+				effect=self._effect,
+			)
+			final_segment_path = clips_dir / f"{scene.id}_seg_{index}.mp4"
+			lip_sync_status = self._maybe_lip_sync_segment(
+				segment,
+				raw_clip_path,
+				final_segment_path,
+				lip_sync_dir,
+				scene.id,
+				index,
+				width,
+				height,
+				lip_sync_enabled=lip_sync_override,
+			)
+			if lip_sync_status is None:
+				if final_segment_path != raw_clip_path:
+					if final_segment_path.exists():
+						final_segment_path.unlink()
+					raw_clip_path.replace(final_segment_path)
+			else:
+				if lip_sync_status.get("status") in {"fallback", "skipped"}:
+					if final_segment_path != raw_clip_path:
+						if final_segment_path.exists():
+							final_segment_path.unlink()
+						raw_clip_path.replace(final_segment_path)
+				lip_sync_log.append(lip_sync_status)
+			segment_clips.append(final_segment_path)
+
+		scene_clip_path = clips_dir / f"{scene.id}.mp4"
+		self._compositor.concat(segment_clips, scene_clip_path)
+
+		if state.video is None:
+			state.video = VideoState(
+				scene_assets=[],
+				final_video_file=None,
+				subtitle_file=None,
+				resolution=f"{width}x{height}",
+				fps=float(self._fps),
+			)
+		else:
+			state.video.resolution = f"{width}x{height}"
+			state.video.fps = float(self._fps)
+
+		image_files = [str(path) for path in speaker_images.values()]
+		scene_assets = state.video.scene_assets or []
+		updated_assets: list[SceneAsset] = []
+		updated = False
+		for asset in scene_assets:
+			if asset.scene_id == scene.id:
+				asset.image_files = image_files
+				asset.clip_file = str(scene_clip_path)
+				updated = True
+			updated_assets.append(asset)
+		if not updated:
+			updated_assets.append(
+				SceneAsset(
+					scene_id=scene.id,
+					image_files=image_files,
+					clip_file=str(scene_clip_path),
+				)
+			)
+		state.video.scene_assets = updated_assets
+
+		lip_sync_enabled = self._lip_sync_enabled if lip_sync_override is None else lip_sync_override
+		prompt_manifest[scene.id] = {
+			"speaker_prompts": speaker_prompts,
+			"effect": self._effect,
+			"resolution": f"{width}x{height}",
+			"lip_sync_enabled": lip_sync_enabled,
+			"lip_sync_segments": lip_sync_log,
+		}
+		prompt_path.parent.mkdir(parents=True, exist_ok=True)
+		prompt_path.write_text(json.dumps(prompt_manifest, indent=2), encoding="utf-8")
+
+		return state
+
+	def rebuild_final_video(
+		self,
+		state: PipelineState,
+		output_dir: Path,
+		burn_subtitles: Optional[bool] = None,
+	) -> PipelineState:
+		if not state.audio or not state.audio.final_audio_file:
+			raise ValueError("Phase 3 requires Phase 2 audio output.")
+
+		project_root = output_dir / state.meta.project_id
+		clips_dir = project_root / "clips"
+		final_dir = project_root / "final"
+		subtitles_dir = project_root / "subtitles"
+		final_dir.mkdir(parents=True, exist_ok=True)
+
+		clip_paths: list[Path] = []
+		scene_assets = {asset.scene_id: asset for asset in (state.video.scene_assets or [])} if state.video else {}
+		for scene in sorted(state.scenes, key=lambda item: item.order or 0):
+			asset = scene_assets.get(scene.id)
+			if asset and asset.clip_file and Path(asset.clip_file).exists():
+				clip_paths.append(Path(asset.clip_file))
+				continue
+			clip_path = clips_dir / f"{scene.id}.mp4"
+			if not clip_path.exists():
+				raise RuntimeError(f"Missing clip for {scene.id}: {clip_path}")
+			clip_paths.append(clip_path)
+
+		concat_path = final_dir / f"{state.meta.project_id}_visual.mp4"
+		self._compositor.concat(clip_paths, concat_path)
+
+		final_audio = Path(state.audio.final_audio_file)
+		final_video_path = final_dir / f"{state.meta.project_id}_final.mp4"
+		self._compositor.mux_audio(concat_path, final_audio, final_video_path)
+
+		subtitle_path: Optional[Path] = None
+		should_burn = self._subtitles_enabled if burn_subtitles is None else burn_subtitles
+		if should_burn and state.audio.timing_manifest:
+			subtitle_path = subtitles_dir / f"{state.meta.project_id}.srt"
+			if not subtitle_path.exists():
+				entries = self._build_subtitle_entries(state)
+				self._subtitles.build_srt(entries, subtitle_path)
+			burned_path = final_dir / f"{state.meta.project_id}_subtitled.mp4"
+			try:
+				self._compositor.burn_subtitles(final_video_path, subtitle_path, burned_path)
+				final_video_path = burned_path
+			except Exception as exc:
+				if self._subtitles_debug:
+					print(f"[subtitles] burn failed: {exc}", flush=True)
+
+		if state.video is None:
+			state.video = VideoState()
+		state.video.final_video_file = str(final_video_path)
+		state.video.subtitle_file = str(subtitle_path) if subtitle_path else None
+		return state
+
 	def _maybe_lip_sync_segment(
 		self,
 		segment: _SceneSegment,
@@ -259,6 +459,7 @@ class VideoAgent:
 		index: int,
 		width: int,
 		height: int,
+		lip_sync_enabled: Optional[bool] = None,
 	) -> Optional[dict[str, object]]:
 		"""Run Wav2Lip on a single segment, returning a status entry or None.
 
@@ -267,7 +468,8 @@ class VideoAgent:
 		On Wav2Lip failure with strict=False, falls back to the raw clip and
 		returns a status entry with ``"status": "fallback"``.
 		"""
-		if not self._lip_sync_enabled or not segment.line_audio_paths:
+		enabled = self._lip_sync_enabled if lip_sync_enabled is None else lip_sync_enabled
+		if not enabled or not segment.line_audio_paths:
 			return None
 		if not segment.front_facing:
 			if self._lip_sync_debug:
@@ -310,7 +512,10 @@ class VideoAgent:
 					raise
 				if self._lip_sync_debug:
 					print(f"[lip-sync] segment {scene_id}#{index}: wav2lip failed, falling back: {exc}", flush=True)
-				return {"segment": index, "status": "fallback", "reason": str(exc).splitlines()[0] if str(exc) else "wav2lip error"}
+				message = str(exc).splitlines()[0] if str(exc) else "wav2lip error"
+				if "face not detected" in message.lower():
+					return {"segment": index, "status": "skipped", "reason": message}
+				return {"segment": index, "status": "fallback", "reason": message}
 
 		try:
 			self._ffmpeg.normalize_clip(
@@ -383,8 +588,10 @@ class VideoAgent:
 		return None
 
 	@staticmethod
-	def _build_speaker_prompt(scene, character) -> str:
+	def _build_speaker_prompt(scene, character, override: Optional[str] = None) -> str:
 		gender_hint = VideoAgent._voice_gender_hint(character)
+		strict_front = bool(scene.dialogue)
+		negative = "no profile, no side view, no back view, no looking away" if strict_front else ""
 		if gender_hint:
 			speaking_prompt = (
 				"photorealistic, sharp focus, high detail, no blur, no distortion, "
@@ -399,12 +606,14 @@ class VideoAgent:
 				"head-on close-up portrait of "
 				f"{character.name} speaking"
 			)
+		if negative:
+			speaking_prompt = f"{speaking_prompt}, {negative}"
 		parts = [
 			scene.visual_prompt,
 			scene.mood,
 			scene.style,
 			speaking_prompt,
-			character.visual.description,
+			override or character.visual.description,
 		]
 		return ", ".join(part for part in parts if part)
 
@@ -428,7 +637,9 @@ class VideoAgent:
 			character = characters.get(speaker_id)
 			if not character:
 				continue
-			prompt = self._build_speaker_prompt(scene, character)
+			overrides = getattr(scene, "character_overrides", {}) or {}
+			override = overrides.get(speaker_id)
+			prompt = self._build_speaker_prompt(scene, character, override)
 			image_path = images_dir / f"{scene.id}_{speaker_id}.png"
 			if not image_path.exists():
 				self._image_tool.generate(prompt, image_path, width, height, seed=seed)
@@ -595,8 +806,11 @@ class VideoAgent:
 			"3/4 view",
 			"over the shoulder",
 		]
-		if any(term in text for term in negative):
-			return False
+		for term in negative:
+			if term in text:
+				pattern = rf"\b(no|not)\s+{re.escape(term)}\b"
+				if not re.search(pattern, text):
+					return False
 		positive = [
 			"front-facing",
 			"camera-facing",

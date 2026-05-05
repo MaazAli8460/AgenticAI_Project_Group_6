@@ -1,0 +1,25 @@
+flowchart LR
+  P1[Phase 1 Output]
+  P2[Phase 2 Output]
+  P3[Phase 3 Output]
+
+  P1 -->|state.json| O1[data/outputs/phase1/]
+  P2 -->|state.json + audio| O2[data/outputs/phase2/]
+  P3 -->|state.json + mp4| O3[data/outputs/phase3/]
+
+  O1 --> P2
+  O2 --> P3
+
+  subgraph Assets
+    A1[Dialogue WAVs]
+    A2[BGM WAVs]
+    A3[Images]
+    A4[Clips]
+    A5[Final MP4]
+  end
+
+  O2 --> A1
+  O2 --> A2
+  O3 --> A3
+  O3 --> A4
+  O3 --> A5

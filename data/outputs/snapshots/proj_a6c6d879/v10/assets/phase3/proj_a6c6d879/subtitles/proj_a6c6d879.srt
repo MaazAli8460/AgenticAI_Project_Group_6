@@ -1,0 +1,24 @@
+1
+00:00:00,000 --> 00:00:01,718
+Wow, I love the smells here!
+
+2
+00:00:05,000 --> 00:00:08,204
+Welcome to my stall, young one! What catches your eye?
+
+3
+00:00:08,404 --> 00:00:10,772
+I love the colors! They're so beautiful.
+
+4
+00:00:10,972 --> 00:00:15,290
+I'm glad you like them. Maybe you can find something special to take home.
+
+5
+00:00:15,290 --> 00:00:17,611
+Oh, this one is perfect! Thank you so much!
+
+6
+00:00:17,811 --> 00:00:21,433
+You're welcome, young one. I'm glad you found something special.
+

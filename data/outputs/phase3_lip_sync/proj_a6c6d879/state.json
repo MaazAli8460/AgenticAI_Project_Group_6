@@ -28,10 +28,10 @@
       "id": "scene_1",
       "title": "Introduction to Aisha",
       "description": "Aisha walks through a crowded market, taking in the sights and sounds.",
-      "setting": "Pakistani market",
+      "setting": "cyberpunk city",
       "mood": "Vibrant",
       "duration_s": 5.0,
-      "visual_prompt": "Aisha walks through a crowded market, with vendors and customers moving around her.",
+      "visual_prompt": "cyberpunk city. Aisha walks through a crowded market, with vendors and customers moving around her.",
       "dialogue": [
         {
           "id": "line_1",
@@ -156,7 +156,7 @@
         "params": {}
       },
       "visual": {
-        "description": "female Aisha has long, dark hair and expressive brown eyes. She wears a traditional shalwar kameez.",
+        "description": "female Aisha has long, blonde hair and expressive brown eyes. She is of Asian descent and wears a traditional shalwar kameez.",
         "style": "Anime-inspired",
         "palette": [
           "#FFC67D",
@@ -343,35 +343,35 @@
       {
         "scene_id": "scene_1",
         "image_files": [
-          "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_1_char_1.png"
+          "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_1_char_1.png"
         ],
-        "clip_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\clips\\scene_1.mp4",
+        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\clips\\scene_1.mp4",
         "subtitle_file": null,
         "transition": null
       },
       {
         "scene_id": "scene_2",
         "image_files": [
-          "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_2_char_2.png",
-          "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_2_char_1.png"
+          "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_2_char_2.png",
+          "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_2_char_1.png"
         ],
-        "clip_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\clips\\scene_2.mp4",
+        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\clips\\scene_2.mp4",
         "subtitle_file": null,
         "transition": null
       },
       {
         "scene_id": "scene_3",
         "image_files": [
-          "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_3_char_1.png",
-          "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_3_char_2.png"
+          "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_3_char_1.png",
+          "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_3_char_2.png"
         ],
-        "clip_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\clips\\scene_3.mp4",
+        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\clips\\scene_3.mp4",
         "subtitle_file": null,
         "transition": null
       }
     ],
-    "final_video_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\final\\proj_a6c6d879_final.mp4",
-    "subtitle_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\subtitles\\proj_a6c6d879.srt",
+    "final_video_file": "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\final\\proj_a6c6d879_subtitled.mp4",
+    "subtitle_file": "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\subtitles\\proj_a6c6d879.srt",
     "resolution": "1280x720",
     "fps": 24.0
   },

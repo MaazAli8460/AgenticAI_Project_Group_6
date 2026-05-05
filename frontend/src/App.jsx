@@ -28,6 +28,8 @@ export default function App() {
     status: "idle",
     message: "",
     phases: { ...emptyPhases },
+    updated_at: "",
+    video_path: "",
   });
   const [events, setEvents] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -40,8 +42,9 @@ export default function App() {
 
   const videoUrl = useMemo(() => {
     if (!projectId) return "";
-    return `${API_BASE}/api/video/${projectId}`;
-  }, [projectId]);
+    const stamp = status.updated_at ? encodeURIComponent(status.updated_at) : "";
+    return `${API_BASE}/api/video/${projectId}${stamp ? `?t=${stamp}` : ""}`;
+  }, [projectId, status.updated_at]);
 
   const stateUrl = useMemo(() => {
     if (!projectId) return "";
@@ -83,6 +86,8 @@ export default function App() {
       const next = { ...prev };
       if (payload.status) next.status = payload.status;
       if (payload.message) next.message = payload.message;
+      if (payload.updated_at) next.updated_at = payload.updated_at;
+      if (payload.video_path) next.video_path = payload.video_path;
       if (payload.phases) next.phases = payload.phases;
       if (payload.phase && payload.phase_status) {
         next.phases = { ...next.phases, [payload.phase]: payload.phase_status };
@@ -229,6 +234,7 @@ export default function App() {
       ]);
       setEditMessage("");
       fetchHistory(projectId);
+      fetchStatus(projectId);
     } catch (error) {
       alert(error.message || "Edit failed");
     } finally {
@@ -241,6 +247,23 @@ export default function App() {
     setEditBusy(true);
     try {
       await postJson(`${API_BASE}/api/edit/undo`, { project_id: projectId, version });
+      fetchHistory(projectId);
+      fetchStatus(projectId);
+    } catch (error) {
+      alert(error.message || "Undo failed");
+    } finally {
+      setEditBusy(false);
+    }
+  }
+
+  async function undoLatest() {
+    if (!projectId) return;
+    setEditBusy(true);
+    try {
+      const result = await postJson(`${API_BASE}/api/edit/undo_latest`, { project_id: projectId });
+      if (result.status === "noop") {
+        alert(result.message || "No previous snapshot available.");
+      }
       fetchHistory(projectId);
       fetchStatus(projectId);
     } catch (error) {
@@ -406,6 +429,11 @@ export default function App() {
 
         <section className="panel">
           <h2>Undo History</h2>
+          <div className="actions">
+            <button onClick={undoLatest} disabled={editBusy || !projectId}>
+              Undo Latest
+            </button>
+          </div>
           <div className="history">
             {editHistory.length === 0 && <p className="muted">No snapshots yet.</p>}
             {editHistory.map((item) => (

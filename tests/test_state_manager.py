@@ -1,9 +1,11 @@
 import json
 from pathlib import Path
+
 from state_manager.state_manager import StateManager
 
-def test_state_manager():
-    base_dir = Path("data/outputs")
+
+def test_state_manager(tmp_path: Path):
+    base_dir = tmp_path / "outputs"
     base_dir.mkdir(parents=True, exist_ok=True)
     
     # 1. Setup mock project assets
@@ -24,6 +26,7 @@ def test_state_manager():
     # 2. Snapshot v1
     print("Taking snapshot v1...")
     manager.snapshot("v1", state_json, asset_paths, "Initial generation")
+    assert manager.previous_version() is None
     
     # 3. Modify state and assets
     state_json["story"] = "Edited Story"
@@ -32,6 +35,7 @@ def test_state_manager():
     # 4. Snapshot v2
     print("Taking snapshot v2...")
     manager.snapshot("v2", state_json, asset_paths, "Edited audio and story")
+    assert manager.previous_version() == "v1"
     
     # 5. Check history
     print("\nHistory:")
@@ -51,4 +55,4 @@ def test_state_manager():
     print("\n✅ StateManager works perfectly!")
 
 if __name__ == "__main__":
-    test_state_manager()
+    test_state_manager(Path("data/outputs"))

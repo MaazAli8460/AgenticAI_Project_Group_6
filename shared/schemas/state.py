@@ -80,6 +80,7 @@ class Scene(BaseModel):
     bgm_mood: Optional[str] = None
     bgm_style: Optional[str] = None
     character_ids: list[str] = Field(default_factory=list)
+    character_overrides: dict[str, str] = Field(default_factory=dict)
 
 
 class TimingEntry(BaseModel):

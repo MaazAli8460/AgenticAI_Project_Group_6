@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "project_id": "test_subtitles_f381d334",
+    "prompt": "test",
+    "created_at": "2026-05-05T19:35:25.221229Z",
+    "version": 1,
+    "schema_version": "1.0",
+    "updated_at": "2026-05-05T19:35:25.221229Z",
+    "language": null,
+    "seed": null,
+    "total_duration_s": null,
+    "tags": []
+  },
+  "story": {
+    "logline": "Test",
+    "synopsis": "Test",
+    "genre": null,
+    "theme": null,
+    "tone": null,
+    "style": null,
+    "target_duration_s": null
+  },
+  "scenes": [
+    {
+      "id": "scene_1",
+      "title": "Scene",
+      "description": "Test",
+      "setting": "Room",
+      "mood": "calm",
+      "duration_s": 2.0,
+      "visual_prompt": "A calm room",
+      "dialogue": [],
+      "order": null,
+      "style": null,
+      "camera": null,
+      "motion": null,
+      "bgm_mood": null,
+      "bgm_style": null,
+      "character_ids": [
+        "char_1"
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char_1",
+      "name": "Ava",
+      "role": "Protagonist",
+      "description": "Curious astronaut",
+      "voice": {
+        "style": "soft",
+        "gender": "female",
+        "age": null,
+        "accent": null,
+        "model": null,
+        "params": {}
+      },
+      "visual": {
+        "description": "Explorer suit",
+        "style": null,
+        "palette": [],
+        "references": []
+      }
+    }
+  ],
+  "audio": null,
+  "video": {
+    "scene_assets": [],
+    "final_video_file": "data\\outputs\\phase3\\test_subtitles_f381d334\\final\\test_subtitles_f381d334_subtitled.mp4",
+    "subtitle_file": "data\\outputs\\phase3\\test_subtitles_f381d334\\subtitles\\test_subtitles_f381d334.srt",
+    "resolution": null,
+    "fps": null
+  },
+  "edits": null,
+  "phases": null
+}

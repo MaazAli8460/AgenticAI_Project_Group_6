@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from pathlib import Path
+import os
 import sys
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -97,6 +98,7 @@ def build_state() -> PipelineState:
 
 
 def test_audio_agent_generates_outputs(tmp_path: Path) -> None:
+    os.environ["TTS_PROVIDER"] = "none"
     state = build_state()
     agent = AudioAgent()
     updated = agent.generate(state, output_dir=tmp_path)
@@ -113,3 +115,31 @@ def test_audio_agent_generates_outputs(tmp_path: Path) -> None:
     assert updated.phases is not None
     assert updated.phases.audio is not None
     assert updated.phases.audio.status == "complete"
+
+
+def test_audio_agent_regenerates_scene_dialogue(tmp_path: Path) -> None:
+    os.environ["TTS_PROVIDER"] = "none"
+    state = build_state()
+    agent = AudioAgent()
+    updated = agent.generate(state, output_dir=tmp_path)
+
+    assert updated.audio is not None
+    original_entries = {
+        entry.line_id: (entry.start_ms, entry.end_ms)
+        for entry in updated.audio.timing_manifest
+        if entry.scene_id == "scene_1"
+    }
+
+    updated = agent.regenerate_scene_dialogue(updated, output_dir=tmp_path, scene_id="scene_1")
+    assert updated.audio is not None
+    new_entries = {
+        entry.line_id: (entry.start_ms, entry.end_ms)
+        for entry in updated.audio.timing_manifest
+        if entry.scene_id == "scene_1"
+    }
+
+    assert new_entries == original_entries
+
+    project_root = tmp_path / state.meta.project_id
+    assert (project_root / "scenes" / "scene_1_dialogue.wav").exists()
+    assert (project_root / "scenes" / "scene_1_mix.wav").exists()

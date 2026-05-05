@@ -5,7 +5,7 @@
     "created_at": "2026-05-04T19:48:54.739018Z",
     "version": 1,
     "schema_version": "1.0",
-    "updated_at": "2026-05-05T11:36:16.481692Z",
+    "updated_at": "2026-05-05T13:33:41.508514Z",
     "language": null,
     "seed": null,
     "total_duration_s": 25.0,
@@ -284,34 +284,34 @@
       {
         "scene_id": "scene_1",
         "image_files": [
-          "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\images\\scene_1_char_1.png"
+          "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_1_char_1.png"
         ],
-        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\clips\\scene_1.mp4",
+        "clip_file": "data\\outputs\\phase3\\proj_601cadb0\\clips\\scene_1.mp4",
         "subtitle_file": null,
         "transition": null
       },
       {
         "scene_id": "scene_2",
         "image_files": [
-          "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\images\\scene_2_char_1.png"
+          "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_2_char_1.png"
         ],
-        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\clips\\scene_2.mp4",
+        "clip_file": "data\\outputs\\phase3\\proj_601cadb0\\clips\\scene_2.mp4",
         "subtitle_file": null,
         "transition": null
       },
       {
         "scene_id": "scene_3",
         "image_files": [
-          "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\images\\scene_3_char_2.png",
-          "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\images\\scene_3_char_1.png"
+          "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_3_char_2.png",
+          "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_3_char_1.png"
         ],
-        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\clips\\scene_3.mp4",
+        "clip_file": "data\\outputs\\phase3\\proj_601cadb0\\clips\\scene_3.mp4",
         "subtitle_file": null,
         "transition": null
       }
     ],
-    "final_video_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\final\\proj_601cadb0_subtitled.mp4",
-    "subtitle_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\subtitles\\proj_601cadb0.srt",
+    "final_video_file": "data\\outputs\\phase3\\proj_601cadb0\\final\\proj_601cadb0_subtitled.mp4",
+    "subtitle_file": "data\\outputs\\phase3\\proj_601cadb0\\subtitles\\proj_601cadb0.srt",
     "resolution": "1280x720",
     "fps": 24.0
   },
@@ -334,7 +334,7 @@
     "video": {
       "status": "complete",
       "run_id": null,
-      "updated_at": "2026-05-05T11:36:16.481692Z",
+      "updated_at": "2026-05-05T13:33:41.508514Z",
       "message": "Video generated",
       "errors": []
     },

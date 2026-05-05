@@ -15,6 +15,7 @@ All phases read/write a shared PipelineState JSON object.
 - Pydantic models: shared/schemas/state.py
 
 Required top-level fields: meta, story, scenes, characters. Later phases append audio, video, and edits.
+Scenes may include optional `character_overrides` for scene-scoped character appearance changes.
 
 ## Repository Layout (Current)
 - agents/: phase agents and orchestration graphs
@@ -64,6 +65,7 @@ ELEVENLABS_OUTPUT_FORMAT=wav_22050
 BGM_LIBRARY_DIR=
 BGM_GAIN=0.2
 DIALOGUE_GAIN=0.9
+FFMPEG_PATH=
 BGM_DEBUG=0
 BGM_STRICT=0
 BGM_START_OFFSET_S=20
@@ -76,6 +78,7 @@ VIDEO_RESOLUTION=1280x720
 VIDEO_FPS=24
 VIDEO_EFFECT=zoom_in
 SUBTITLES_ENABLED=1
+SUBTITLES_DEBUG=0
 FRONTEND_ORIGIN=http://localhost:5173
 IMG_API_KEY=
 BGM_API_KEY=
@@ -90,7 +93,15 @@ WAV2LIP_RESIZE_FACTOR=1
 WAV2LIP_NOSMOOTH=0
 WAV2LIP_BATCH_SIZE=128
 WAV2LIP_FACE_DET_BATCH_SIZE=16
+WAV2LIP_REMOTE_URL=
 ```
+
+FFmpeg path (optional):
+- Find the binary path:
+	- Windows: run `where ffmpeg` or check `C:/Users/<you>/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_*/bin/ffmpeg.exe`
+	- macOS/Linux: run `which ffmpeg` or `command -v ffmpeg`
+- Add the full path to your `.env` at the repo root:
+	- `FFMPEG_PATH=C:/Users/<you>/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_*/bin/ffmpeg.exe`
 
 ## Run (Phase 4 Web UI)
 Start the backend API (Phase 4 orchestration server):
@@ -130,12 +141,19 @@ python run_phase5.py --project-id <project_id>
 ```
 The agent supports conversational intent classification, `/undo` version control, and granular re-runs via asset caching. When making edits, it actively manages the pipeline by deleting targeted cached assets (images, BGM, lip-syncs) so that underlying phase scripts automatically re-render only the modified aspects.
 
+Edit agent behavior:
+- Scene-scoped appearance edits use `character_overrides` so only the specified scene is re-rendered.
+- Scene-level BGM edits regenerate only that scene's audio and remux the final video (dialogue is reused).
+- Subtitle toggles reuse pre-rendered `_final.mp4` / `_subtitled.mp4` outputs (no re-render).
+- Lip-sync is non-blocking: failures or missing faces fall back to raw clips.
+
 Phase 3 behavior:
 - Scene segments are created only on speaker changes (no fixed splitting).
 - Single-speaker scenes render as one continuous clip.
 - Per-speaker images are generated and stitched per segment.
 - Dialogue speaker images are prompted as camera-facing, photorealistic portraits
 	with sharp focus to support lip-sync.
+ - Dialogue scenes enforce strict front-facing prompts to improve lip-sync stability.
 
 If ELEVENLABS_VOICE_ID is not set, the TTS tool will fetch your available ElevenLabs voices and
 select one based on character gender, style/tone keywords, accent, and age labels when possible.
@@ -211,6 +229,7 @@ LIP_SYNC_ENABLED=1
 WAV2LIP_DIR=<repo>/third_party/Wav2Lip
 WAV2LIP_CHECKPOINT=<repo>/third_party/Wav2Lip/checkpoints/wav2lip_gan.pth
 WAV2LIP_PYTHON=                  # leave empty to reuse this project's interpreter
+WAV2LIP_REMOTE_URL=              # optional Colab/ngrok endpoint for remote lip-sync
 # Optional tuning:
 WAV2LIP_PADS=0,10,0,0
 WAV2LIP_RESIZE_FACTOR=1
@@ -228,6 +247,8 @@ Behavior:
 - If Wav2Lip fails on a single segment (face not detected, etc.), that segment falls
 	back to the raw image clip while other segments still get lip-synced. Set
 	`LIP_SYNC_STRICT=1` to abort the run instead.
+- If `WAV2LIP_REMOTE_URL` is set and the server is down, lip-sync calls will be skipped
+	per segment and the raw clip will be used.
 - Set `LIP_SYNC_DEBUG=1` to log per-segment lip-sync decisions and the underlying
 	Wav2Lip command.
 - Per-scene metadata about which segments were lip-synced (or fell back, with reason)

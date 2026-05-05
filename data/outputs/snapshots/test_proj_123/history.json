@@ -1,12 +1,12 @@
 [
   {
-    "version": "v1",
-    "timestamp": "2026-05-05T12:10:54.669491+00:00",
-    "diff_summary": "Initial generation"
-  },
-  {
     "version": "v2",
     "timestamp": "2026-05-05T12:10:54.697743+00:00",
     "diff_summary": "Edited audio and story"
+  },
+  {
+    "version": "v1",
+    "timestamp": "2026-05-05T19:26:14.418535+00:00",
+    "diff_summary": "Initial generation"
   }
 ]

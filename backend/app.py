@@ -132,6 +132,16 @@ def _find_state_path(project_id: str) -> Optional[Path]:
 
 
 def _find_video_path(project_id: str) -> Optional[Path]:
+	state_path = _find_state_path(project_id)
+	if state_path and state_path.exists():
+		try:
+			state = _load_pipeline_state(state_path)
+			if state.video and state.video.final_video_file:
+				candidate = Path(state.video.final_video_file)
+				if candidate.exists():
+					return candidate
+		except Exception:
+			pass
 	for base_dir in (PHASE3_DIR, PHASE3_LIP_DIR):
 		candidate = base_dir / project_id / "final" / f"{project_id}_final.mp4"
 		if candidate.exists():
@@ -171,6 +181,10 @@ class EditRequest(BaseModel):
 class UndoRequest(BaseModel):
 	project_id: str = Field(min_length=1)
 	version: str = Field(min_length=1)
+
+
+class UndoLatestRequest(BaseModel):
+	project_id: str = Field(min_length=1)
 
 
 app = FastAPI(title="Agentic AI Phase 4 API")
@@ -429,27 +443,36 @@ def _run_edit_command(project_id: str, message: str) -> dict[str, Any]:
 	agent_reply = ""
 	tool_ran = False
 
-	for event in graph.stream(
-		{"project_id": project_id, "messages": [HumanMessage(content=message)]},
-		config,
-	):
-		for node_name, node_output in event.items():
-			if node_name == "agent":
-				last_msg = node_output["messages"][-1]
-				if isinstance(last_msg, AIMessage):
-					agent_reply = last_msg.content
-					if getattr(last_msg, "tool_calls", None):
-						tool_calls = [call["name"] for call in last_msg.tool_calls]
-			elif node_name == "tools":
-				tool_ran = True
-
-	snapshot_version = _snapshot_edit(project_id, message) if tool_ran else None
-	return {
-		"project_id": project_id,
-		"reply": agent_reply,
-		"tool_calls": tool_calls,
-		"snapshot_version": snapshot_version,
-	}
+	try:
+		for event in graph.stream(
+			{"project_id": project_id, "messages": [HumanMessage(content=message)]},
+			config,
+		):
+			for node_name, node_output in event.items():
+				if node_name == "agent":
+					last_msg = node_output["messages"][-1]
+					if isinstance(last_msg, AIMessage):
+						agent_reply = last_msg.content
+						if getattr(last_msg, "tool_calls", None):
+							tool_calls = [call["name"] for call in last_msg.tool_calls]
+				elif node_name == "tools":
+					tool_ran = True
+	
+		snapshot_version = _snapshot_edit(project_id, message) if tool_ran else None
+		return {
+			"project_id": project_id,
+			"reply": agent_reply,
+			"tool_calls": tool_calls,
+			"snapshot_version": snapshot_version,
+		}
+	except Exception as exc:
+		return {
+			"project_id": project_id,
+			"reply": f"Edit agent failed: {exc}",
+			"tool_calls": [],
+			"snapshot_version": None,
+			"error": str(exc),
+		}
 
 
 async def _run_in_thread(func, *args):
@@ -600,6 +623,25 @@ async def edit_undo(request: UndoRequest) -> dict[str, Any]:
 		state_json = manager.revert(request.version)
 		_apply_state_to_outputs(request.project_id, state_json)
 		return {"status": "reverted", "version": request.version}
+
+	result = await _run_in_thread(_do_revert)
+	_emit(job.project_id, {"status": "complete", "message": "Undo complete"})
+	return result
+
+
+@app.post("/api/edit/undo_latest")
+async def edit_undo_latest(request: UndoLatestRequest) -> dict[str, Any]:
+	job = _ensure_job(request.project_id, None)
+	manager = StateManager(project_id=request.project_id, base_dir=OUTPUT_ROOT)
+	previous_version = manager.previous_version()
+	if not previous_version:
+		return {"status": "noop", "message": "No previous snapshot available."}
+	_emit(job.project_id, {"status": "running", "message": f"Undo {previous_version}"})
+
+	def _do_revert() -> dict[str, Any]:
+		state_json = manager.revert(previous_version)
+		_apply_state_to_outputs(request.project_id, state_json)
+		return {"status": "reverted", "version": previous_version}
 
 	result = await _run_in_thread(_do_revert)
 	_emit(job.project_id, {"status": "complete", "message": "Undo complete"})

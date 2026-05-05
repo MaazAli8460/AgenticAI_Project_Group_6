@@ -1,0 +1,16 @@
+flowchart TD
+  A[User Edit Request] --> B[Intent Classifier]
+  B --> C{Target?}
+  C -->|audio| D[Update Audio State]
+  C -->|video_frame| E[Update Visual State]
+  C -->|video| F[Update Composition State]
+  C -->|script| G[Regenerate Script]
+
+  D --> H[Selective Asset Deletion]
+  E --> H
+  F --> H
+  G --> H
+
+  H --> I[Optional Phase Rerun]
+  I --> J[Snapshot State]
+  J --> K[History + Undo]

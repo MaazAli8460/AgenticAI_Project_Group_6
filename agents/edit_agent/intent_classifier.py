@@ -1,5 +1,6 @@
 from enum import Enum
 import os
+import re
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field, ValidationError
@@ -71,7 +72,8 @@ Return EXACTLY a JSON object matching this schema:
         
         try:
             raw_json = self._llm.chat_json(messages, temperature=0.0)
-            return EditIntent.model_validate(raw_json)
+            intent = EditIntent.model_validate(raw_json)
+            return self._apply_scope_heuristics(query, intent)
         except ValidationError as exc:
             # Fallback repair logic if the LLM output doesn't match the schema
             repair_messages = [
@@ -79,4 +81,24 @@ Return EXACTLY a JSON object matching this schema:
                 {"role": "user", "content": f"JSON: {raw_json}\nError: {exc}"}
             ]
             fixed_json = self._llm.chat_json(repair_messages, temperature=0.0)
-            return EditIntent.model_validate(fixed_json)
+            intent = EditIntent.model_validate(fixed_json)
+            return self._apply_scope_heuristics(query, intent)
+
+    @staticmethod
+    def _apply_scope_heuristics(query: str, intent: EditIntent) -> EditIntent:
+        if intent.scope != "global":
+            return intent
+
+        text = query.lower()
+        if "narrator" in text:
+            return intent.model_copy(update={"scope": "character:narrator"})
+
+        scene_match = re.search(r"\bscene[_\s-]*(\d+)\b", text)
+        if scene_match:
+            return intent.model_copy(update={"scope": f"scene:{scene_match.group(1)}"})
+
+        character_match = re.search(r"\bcharacter\s+(\d+)\b", text)
+        if character_match:
+            return intent.model_copy(update={"scope": f"character:{character_match.group(1)}"})
+
+        return intent

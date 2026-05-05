@@ -2,7 +2,7 @@ import json
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 
 class StateManager:
@@ -129,3 +129,10 @@ class StateManager:
     def history(self) -> List[Dict[str, Any]]:
         """Returns the chronological list of all saved snapshots."""
         return self._load_history()
+
+    def previous_version(self) -> Optional[str]:
+        """Return the previous snapshot version (vN-1), or None if unavailable."""
+        history = self._load_history()
+        if len(history) < 2:
+            return None
+        return history[-2].get("version")

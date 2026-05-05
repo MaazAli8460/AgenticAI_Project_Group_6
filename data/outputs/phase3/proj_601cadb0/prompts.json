@@ -2,7 +2,7 @@
   "scene_1": {
     "speaker_prompts": {
       "char_1": {
-        "prompt": "Mars surface with red dust and rovers. Astronaut standing on Mars surface with a massive ocean in the background, Hopeful, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with blonde hair and blue eyes",
+        "prompt": "Astronaut standing on Mars surface with a massive ocean in the background, Hopeful, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
         "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_1_char_1.png"
       }
     },
@@ -23,7 +23,7 @@
   "scene_2": {
     "speaker_prompts": {
       "char_1": {
-        "prompt": "Astronaut looking at a Martian creature, Contemplative, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with blonde hair and blue eyes",
+        "prompt": "Astronaut looking at a Martian creature, Contemplative, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
         "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_2_char_1.png"
       }
     },
@@ -48,7 +48,7 @@
         "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_3_char_2.png"
       },
       "char_1": {
-        "prompt": "Astronaut transmitting data back to Earth, Determined, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with blonde hair and blue eyes",
+        "prompt": "Astronaut transmitting data back to Earth, Determined, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
         "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_3_char_1.png"
       }
     },

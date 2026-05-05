@@ -1,0 +1,17 @@
+flowchart LR
+  U[User Prompt] --> P1[Phase 1: Story + Script]
+  P1 -->|PipelineState JSON| P2[Phase 2: Audio]
+  P2 -->|Timing Manifest + Audio| P3[Phase 3: Video]
+  P3 -->|Final MP4| P4[Phase 4: Web UI]
+  P4 --> P5[Phase 5: Edit Agent]
+
+  P1 --- S[(Shared JSON State)]
+  P2 --- S
+  P3 --- S
+  P5 --- S
+
+  P4 <-->|SSE + API| UI[React UI]
+  UI --> P4
+
+  SM[State Manager] -->|Snapshots| S
+  P5 --> SM

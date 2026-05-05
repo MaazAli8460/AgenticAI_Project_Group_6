@@ -1,0 +1,84 @@
+{
+  "scene_1": {
+    "speaker_prompts": {
+      "char_1": {
+        "prompt": "cyberpunk city. Aisha walks through a crowded market, with vendors and customers moving around her., Vibrant, Fast-paced, photorealistic, sharp focus, high detail, no blur, no distortion, front-facing, looking directly at camera, camera-facing, head-on close-up portrait of a female character named Aisha speaking, no profile, no side view, no back view, no looking away, female Aisha has long, dark hair and expressive brown eyes. She wears a traditional shalwar kameez.",
+        "image": "data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_1_char_1.png",
+        "front_facing": true
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720",
+    "lip_sync_enabled": false,
+    "lip_sync_segments": []
+  },
+  "scene_2": {
+    "speaker_prompts": {
+      "char_2": {
+        "prompt": "Aisha stands at the vendor's stall, touching the fabrics and looking up at the vendor with a smile., Friendly, Intimate, photorealistic, sharp focus, high detail, no blur, no distortion, front-facing, looking directly at camera, camera-facing, head-on close-up portrait of a male character named Vendor speaking, male The vendor has a bushy beard and a kind smile. He is facing forward and wears a traditional kurta.",
+        "image": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_2_char_2.png",
+        "front_facing": true
+      },
+      "char_1": {
+        "prompt": "Aisha stands at the vendor's stall, touching the fabrics and looking up at the vendor with a smile., Friendly, Intimate, photorealistic, sharp focus, high detail, no blur, no distortion, front-facing, looking directly at camera, camera-facing, head-on close-up portrait of a female character named Aisha speaking, female Aisha has long, dark hair and expressive brown eyes. She wears a traditional shalwar kameez.",
+        "image": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_2_char_1.png",
+        "front_facing": true
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720",
+    "lip_sync_enabled": true,
+    "lip_sync_segments": [
+      {
+        "segment": 1,
+        "status": "fallback",
+        "reason": "Remote Wav2Lip failed (HTTP 500): {\"error\":\"Face not detected in one or more frames.\"}"
+      },
+      {
+        "segment": 2,
+        "status": "lip_synced",
+        "speaker_id": "char_1",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\lip_sync\\scene_2_seg_2_dialogue.wav",
+        "raw_clip": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\clips\\scene_2_seg_2_raw.mp4",
+        "synced_clip": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\lip_sync\\scene_2_seg_2_synced.mp4"
+      },
+      {
+        "segment": 3,
+        "status": "fallback",
+        "reason": "Remote Wav2Lip failed (HTTP 500): {\"error\":\"Face not detected in one or more frames.\"}"
+      }
+    ]
+  },
+  "scene_3": {
+    "speaker_prompts": {
+      "char_1": {
+        "prompt": "Aisha holds up a vibrant fabric, with the vendor smiling in the background., Exciting, Dramatic, photorealistic, sharp focus, high detail, no blur, no distortion, front-facing, looking directly at camera, camera-facing, head-on close-up portrait of a female character named Aisha speaking, female Aisha has long, dark hair and expressive brown eyes. She wears a traditional shalwar kameez.",
+        "image": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_3_char_1.png",
+        "front_facing": true
+      },
+      "char_2": {
+        "prompt": "Aisha holds up a vibrant fabric, with the vendor smiling in the background., Exciting, Dramatic, photorealistic, sharp focus, high detail, no blur, no distortion, front-facing, looking directly at camera, camera-facing, head-on close-up portrait of a male character named Vendor speaking, male The vendor has a bushy beard and a kind smile. He is facing forward and wears a traditional kurta.",
+        "image": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\images\\scene_3_char_2.png",
+        "front_facing": true
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720",
+    "lip_sync_enabled": true,
+    "lip_sync_segments": [
+      {
+        "segment": 1,
+        "status": "lip_synced",
+        "speaker_id": "char_1",
+        "audio_file": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\lip_sync\\scene_3_seg_1_dialogue.wav",
+        "raw_clip": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\clips\\scene_3_seg_1_raw.mp4",
+        "synced_clip": "D:\\D drive\\SEm 08\\Agentic\\Project\\Ver_0.1\\AgenticAI_Project_Group_6\\data\\outputs\\phase3_lip_sync\\proj_a6c6d879\\lip_sync\\scene_3_seg_1_synced.mp4"
+      },
+      {
+        "segment": 2,
+        "status": "fallback",
+        "reason": "Remote Wav2Lip failed (HTTP 503): ngrok gateway error"
+      }
+    ]
+  }
+}
