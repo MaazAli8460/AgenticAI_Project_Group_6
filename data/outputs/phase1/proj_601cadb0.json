@@ -28,10 +28,10 @@
       "id": "scene_1",
       "title": "Discovery",
       "description": "Maya discovers the hidden ocean",
-      "setting": "Mars surface",
+      "setting": "Mars surface with red dust and rovers",
       "mood": "Hopeful",
       "duration_s": 5.0,
-      "visual_prompt": "Astronaut standing on Mars surface with a massive ocean in the background",
+      "visual_prompt": "Mars surface with red dust and rovers. Astronaut standing on Mars surface with a massive ocean in the background",
       "dialogue": [
         {
           "id": "line_1",
@@ -47,7 +47,7 @@
       "style": "Realistic",
       "camera": "Establishing shot",
       "motion": "Static",
-      "bgm_mood": "hopefull",
+      "bgm_mood": "scary",
       "bgm_style": "Orchestral",
       "character_ids": [
         "char_1"
@@ -129,7 +129,7 @@
       "role": "Protagonist",
       "description": "Young female astronaut",
       "voice": {
-        "style": "Clear",
+        "style": "Confident and booming",
         "gender": "female",
         "age": "30",
         "accent": "American",
@@ -137,7 +137,7 @@
         "params": {}
       },
       "visual": {
-        "description": "Female astronaut with short brown hair and blue eyes",
+        "description": "Female astronaut with blonde hair and blue eyes",
         "style": "Realistic",
         "palette": [
           "#3498db",
@@ -154,7 +154,7 @@
       "role": "Supporting",
       "description": "Male voice on the radio",
       "voice": {
-        "style": "Authoritative",
+        "style": "Panicked and urgent",
         "gender": "male",
         "age": "40",
         "accent": "American",

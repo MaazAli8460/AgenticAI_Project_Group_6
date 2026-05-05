@@ -1,0 +1,344 @@
+{
+  "meta": {
+    "project_id": "proj_601cadb0",
+    "prompt": "A young female astronaut discovers a hidden ocean on Mars and must decide whether to reveal it. As it may lead to possible mars habitation project. this may result in a risk to the indegnious mars species.",
+    "created_at": "2026-05-04T19:48:54.739018Z",
+    "version": 1,
+    "schema_version": "1.0",
+    "updated_at": "2026-05-05T11:36:16.481692Z",
+    "language": null,
+    "seed": null,
+    "total_duration_s": 25.0,
+    "tags": [
+      "phase1",
+      "story"
+    ]
+  },
+  "story": {
+    "logline": "A young female astronaut must decide whether to reveal a hidden ocean on Mars, risking the indigenous species.",
+    "synopsis": "Astronaut Maya discovers a hidden ocean on Mars, but revealing it may put the Martian species at risk.",
+    "genre": "Science Fiction",
+    "theme": "Environmentalism vs Progress",
+    "tone": "Contemplative",
+    "style": "Realistic",
+    "target_duration_s": 30.0
+  },
+  "scenes": [
+    {
+      "id": "scene_1",
+      "title": "Discovery",
+      "description": "Maya discovers the hidden ocean",
+      "setting": "Mars surface",
+      "mood": "Hopeful",
+      "duration_s": 5.0,
+      "visual_prompt": "Astronaut standing on Mars surface with a massive ocean in the background",
+      "dialogue": [
+        {
+          "id": "line_1",
+          "character_id": "char_1",
+          "text": "I've found something incredible!",
+          "emotion": "Excitement",
+          "direction": "Into radio",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 1,
+      "style": "Realistic",
+      "camera": "Establishing shot",
+      "motion": "Static",
+      "bgm_mood": "hopefull",
+      "bgm_style": "Orchestral",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_2",
+      "title": "Dilemma",
+      "description": "Maya considers the consequences of revealing the ocean",
+      "setting": "Mars surface",
+      "mood": "Contemplative",
+      "duration_s": 10.0,
+      "visual_prompt": "Astronaut looking at a Martian creature",
+      "dialogue": [
+        {
+          "id": "line_2",
+          "character_id": "char_1",
+          "text": "But at what cost to the Martian life?",
+          "emotion": "Concern",
+          "direction": "To herself",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 2,
+      "style": "Realistic",
+      "camera": "Close-up",
+      "motion": "Slow zoom",
+      "bgm_mood": "mysterious",
+      "bgm_style": "Piano",
+      "character_ids": [
+        "char_1"
+      ]
+    },
+    {
+      "id": "scene_3",
+      "title": "Decision",
+      "description": "Maya decides to reveal the ocean",
+      "setting": "Mars surface",
+      "mood": "Determined",
+      "duration_s": 10.0,
+      "visual_prompt": "Astronaut transmitting data back to Earth",
+      "dialogue": [
+        {
+          "id": "line_3",
+          "character_id": "char_2",
+          "text": "Maya, we're receiving your transmission.",
+          "emotion": "Professional",
+          "direction": "From radio",
+          "start_ms": null,
+          "end_ms": null
+        },
+        {
+          "id": "line_4",
+          "character_id": "char_1",
+          "text": "I'm doing what's right for humanity.",
+          "emotion": "Determination",
+          "direction": "Into radio",
+          "start_ms": null,
+          "end_ms": null
+        }
+      ],
+      "order": 3,
+      "style": "Realistic",
+      "camera": "Over-the-shoulder",
+      "motion": "Fast cut",
+      "bgm_mood": "confident",
+      "bgm_style": "Electronic",
+      "character_ids": [
+        "char_1",
+        "char_2"
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "id": "char_1",
+      "name": "Maya",
+      "role": "Protagonist",
+      "description": "Young female astronaut",
+      "voice": {
+        "style": "Clear",
+        "gender": "female",
+        "age": "30",
+        "accent": "American",
+        "model": "GoogleTextToSpeech",
+        "params": {}
+      },
+      "visual": {
+        "description": "Female astronaut with short brown hair and blue eyes",
+        "style": "Realistic",
+        "palette": [
+          "#3498db",
+          "#2ecc71"
+        ],
+        "references": [
+          "NASA astronaut suits"
+        ]
+      }
+    },
+    {
+      "id": "char_2",
+      "name": "Mission Control",
+      "role": "Supporting",
+      "description": "Male voice on the radio",
+      "voice": {
+        "style": "Authoritative",
+        "gender": "male",
+        "age": "40",
+        "accent": "American",
+        "model": "GoogleTextToSpeech",
+        "params": {}
+      },
+      "visual": {
+        "description": "Male face on a screen",
+        "style": "Realistic",
+        "palette": [
+          "#2c3e50",
+          "#95a5a6"
+        ],
+        "references": [
+          "NASA control room"
+        ]
+      }
+    }
+  ],
+  "audio": {
+    "timing_manifest": [
+      {
+        "scene_id": "scene_1",
+        "line_id": "line_1",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\lines\\line_1.wav",
+        "start_ms": 0,
+        "end_ms": 1578,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_2",
+        "line_id": "line_2",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\lines\\line_2.wav",
+        "start_ms": 5000,
+        "end_ms": 7043,
+        "character_id": "char_1"
+      },
+      {
+        "scene_id": "scene_3",
+        "line_id": "line_3",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\lines\\line_3.wav",
+        "start_ms": 15000,
+        "end_ms": 17229,
+        "character_id": "char_2"
+      },
+      {
+        "scene_id": "scene_3",
+        "line_id": "line_4",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\lines\\line_4.wav",
+        "start_ms": 17429,
+        "end_ms": 19379,
+        "character_id": "char_1"
+      }
+    ],
+    "lines": [
+      {
+        "line_id": "line_1",
+        "scene_id": "scene_1",
+        "character_id": "char_1",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\lines\\line_1.wav",
+        "text": "I've found something incredible!",
+        "start_ms": 0,
+        "end_ms": 1578,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_2",
+        "scene_id": "scene_2",
+        "character_id": "char_1",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\lines\\line_2.wav",
+        "text": "But at what cost to the Martian life?",
+        "start_ms": 5000,
+        "end_ms": 7043,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_3",
+        "scene_id": "scene_3",
+        "character_id": "char_2",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\lines\\line_3.wav",
+        "text": "Maya, we're receiving your transmission.",
+        "start_ms": 15000,
+        "end_ms": 17229,
+        "voice_params": {}
+      },
+      {
+        "line_id": "line_4",
+        "scene_id": "scene_3",
+        "character_id": "char_1",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\lines\\line_4.wav",
+        "text": "I'm doing what's right for humanity.",
+        "start_ms": 17429,
+        "end_ms": 19379,
+        "voice_params": {}
+      }
+    ],
+    "bgm_tracks": [
+      {
+        "scene_id": "scene_1",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\bgm\\scene_1_bgm.wav",
+        "start_ms": 0,
+        "end_ms": 5000,
+        "mood": "hopefull",
+        "style": "Orchestral"
+      },
+      {
+        "scene_id": "scene_2",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\bgm\\scene_2_bgm.wav",
+        "start_ms": 5000,
+        "end_ms": 15000,
+        "mood": "mysterious",
+        "style": "Piano"
+      },
+      {
+        "scene_id": "scene_3",
+        "audio_file": "data\\outputs\\phase2\\proj_601cadb0\\bgm\\scene_3_bgm.wav",
+        "start_ms": 15000,
+        "end_ms": 25000,
+        "mood": "confident",
+        "style": "Electronic"
+      }
+    ],
+    "final_audio_file": "data\\outputs\\phase2\\proj_601cadb0\\final\\proj_601cadb0_final.wav"
+  },
+  "video": {
+    "scene_assets": [
+      {
+        "scene_id": "scene_1",
+        "image_files": [
+          "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\images\\scene_1_char_1.png"
+        ],
+        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\clips\\scene_1.mp4",
+        "subtitle_file": null,
+        "transition": null
+      },
+      {
+        "scene_id": "scene_2",
+        "image_files": [
+          "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\images\\scene_2_char_1.png"
+        ],
+        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\clips\\scene_2.mp4",
+        "subtitle_file": null,
+        "transition": null
+      },
+      {
+        "scene_id": "scene_3",
+        "image_files": [
+          "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\images\\scene_3_char_2.png",
+          "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\images\\scene_3_char_1.png"
+        ],
+        "clip_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\clips\\scene_3.mp4",
+        "subtitle_file": null,
+        "transition": null
+      }
+    ],
+    "final_video_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\final\\proj_601cadb0_subtitled.mp4",
+    "subtitle_file": "data\\outputs\\phase3_lip_sync\\proj_601cadb0\\subtitles\\proj_601cadb0.srt",
+    "resolution": "1280x720",
+    "fps": 24.0
+  },
+  "edits": null,
+  "phases": {
+    "story": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-04T19:48:54.739018Z",
+      "message": "Story generated",
+      "errors": []
+    },
+    "audio": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-04T19:50:13.152737Z",
+      "message": "Audio generated",
+      "errors": []
+    },
+    "video": {
+      "status": "complete",
+      "run_id": null,
+      "updated_at": "2026-05-05T11:36:16.481692Z",
+      "message": "Video generated",
+      "errors": []
+    },
+    "web": null,
+    "edit": null
+  }
+}

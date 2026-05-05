@@ -1,0 +1,77 @@
+{
+  "scene_1": {
+    "speaker_prompts": {
+      "char_1": {
+        "prompt": "Astronaut standing on Mars surface with a massive ocean in the background, Hopeful, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
+        "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_1_char_1.png"
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720",
+    "lip_sync_enabled": true,
+    "lip_sync_segments": [
+      {
+        "segment": 1,
+        "status": "lip_synced",
+        "speaker_id": "char_1",
+        "audio_file": "data\\outputs\\phase3\\proj_601cadb0\\lip_sync\\scene_1_seg_1_dialogue.wav",
+        "raw_clip": "data\\outputs\\phase3\\proj_601cadb0\\clips\\scene_1_seg_1_raw.mp4",
+        "synced_clip": "data\\outputs\\phase3\\proj_601cadb0\\lip_sync\\scene_1_seg_1_synced.mp4"
+      }
+    ]
+  },
+  "scene_2": {
+    "speaker_prompts": {
+      "char_1": {
+        "prompt": "Astronaut looking at a Martian creature, Contemplative, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
+        "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_2_char_1.png"
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720",
+    "lip_sync_enabled": true,
+    "lip_sync_segments": [
+      {
+        "segment": 1,
+        "status": "lip_synced",
+        "speaker_id": "char_1",
+        "audio_file": "data\\outputs\\phase3\\proj_601cadb0\\lip_sync\\scene_2_seg_1_dialogue.wav",
+        "raw_clip": "data\\outputs\\phase3\\proj_601cadb0\\clips\\scene_2_seg_1_raw.mp4",
+        "synced_clip": "data\\outputs\\phase3\\proj_601cadb0\\lip_sync\\scene_2_seg_1_synced.mp4"
+      }
+    ]
+  },
+  "scene_3": {
+    "speaker_prompts": {
+      "char_2": {
+        "prompt": "Astronaut transmitting data back to Earth, Determined, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a male character named Mission Control speaking, Male face on a screen",
+        "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_3_char_2.png"
+      },
+      "char_1": {
+        "prompt": "Astronaut transmitting data back to Earth, Determined, Realistic, photorealistic, sharp focus, high detail, no blur, no distortion, camera-facing, front-facing close-up portrait of a female character named Maya speaking, Female astronaut with short brown hair and blue eyes",
+        "image": "data\\outputs\\phase3\\proj_601cadb0\\images\\scene_3_char_1.png"
+      }
+    },
+    "effect": "zoom_in",
+    "resolution": "1280x720",
+    "lip_sync_enabled": true,
+    "lip_sync_segments": [
+      {
+        "segment": 1,
+        "status": "lip_synced",
+        "speaker_id": "char_2",
+        "audio_file": "data\\outputs\\phase3\\proj_601cadb0\\lip_sync\\scene_3_seg_1_dialogue.wav",
+        "raw_clip": "data\\outputs\\phase3\\proj_601cadb0\\clips\\scene_3_seg_1_raw.mp4",
+        "synced_clip": "data\\outputs\\phase3\\proj_601cadb0\\lip_sync\\scene_3_seg_1_synced.mp4"
+      },
+      {
+        "segment": 2,
+        "status": "lip_synced",
+        "speaker_id": "char_1",
+        "audio_file": "data\\outputs\\phase3\\proj_601cadb0\\lip_sync\\scene_3_seg_2_dialogue.wav",
+        "raw_clip": "data\\outputs\\phase3\\proj_601cadb0\\clips\\scene_3_seg_2_raw.mp4",
+        "synced_clip": "data\\outputs\\phase3\\proj_601cadb0\\lip_sync\\scene_3_seg_2_synced.mp4"
+      }
+    ]
+  }
+}

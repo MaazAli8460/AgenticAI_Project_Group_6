@@ -229,11 +229,14 @@ Completed:
 - Phase 1 CLI runner with file output
 - Phase 2 audio generation with timing manifest, BGM layering, and file output
 - Phase 3 video generation with per-scene assets and final MP4
+- Phase 5 Planning and Architecture design
+- Phase 5 edit agent and undo (Module 1: State Versioning)
+- Phase 5 edit agent and undo (Module 2: Intent Classification)
+- Phase 5 edit agent and undo (Module 3/4: MCP Tools & LangGraph Orchestrator)
+- Phase 5 CLI interactive editor (`run_phase5.py`)
 
 In progress:
 - Phase 4 web interface
-- Phase 5 edit agent and undo
 
 ## Next Steps
-1. Phase 4: create FastAPI endpoints + React UI for orchestration.
-2. Phase 5: implement intent classifier, edit executor, and state history.
+1. Phase 4: Create FastAPI endpoints + React UI for orchestration.

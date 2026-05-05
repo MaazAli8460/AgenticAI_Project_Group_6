@@ -139,15 +139,16 @@ class VideoAgent:
 			for index, segment in enumerate(segments, start=1):
 				duration_s = max(segment.duration_ms / 1000.0, 0.1)
 				raw_clip_path = clips_dir / f"{scene.id}_seg_{index}_raw.mp4"
-				self._ffmpeg.image_to_clip(
-					segment.image_path,
-					raw_clip_path,
-					duration_s,
-					width,
-					height,
-					self._fps,
-					effect=self._effect,
-				)
+				if not raw_clip_path.exists():
+					self._ffmpeg.image_to_clip(
+						segment.image_path,
+						raw_clip_path,
+						duration_s,
+						width,
+						height,
+						self._fps,
+						effect=self._effect,
+					)
 				final_segment_path = clips_dir / f"{scene.id}_seg_{index}.mp4"
 				lip_sync_status = self._maybe_lip_sync_segment(
 					segment,
@@ -250,46 +251,34 @@ class VideoAgent:
 
 		lip_sync_dir.mkdir(parents=True, exist_ok=True)
 		segment_audio_path = lip_sync_dir / f"{scene_id}_seg_{index}_dialogue.wav"
-		try:
-			build_segment_audio(
-				segment.line_audio_paths,
-				segment.duration_ms,
-				segment_audio_path,
-			)
-		except Exception as exc:
-			if self._lip_sync_strict:
-				raise
-			if self._lip_sync_debug:
-				print(
-					f"[lip-sync] segment {scene_id}#{index}: failed to build audio: {exc}",
-					flush=True,
+		if not segment_audio_path.exists():
+			try:
+				build_segment_audio(
+					segment.line_audio_paths,
+					segment.duration_ms,
+					segment_audio_path,
 				)
-			return {
-				"segment": index,
-				"status": "fallback",
-				"reason": f"audio build failed: {exc}",
-			}
+			except Exception as exc:
+				if self._lip_sync_strict:
+					raise
+				if self._lip_sync_debug:
+					print(f"[lip-sync] segment {scene_id}#{index}: failed to build audio: {exc}", flush=True)
+				return {"segment": index, "status": "fallback", "reason": f"audio build failed: {exc}"}
 
 		lip_synced_path = lip_sync_dir / f"{scene_id}_seg_{index}_synced.mp4"
-		try:
-			self._lip_sync.lip_sync(
-				raw_clip_path,
-				segment_audio_path,
-				lip_synced_path,
-			)
-		except Wav2LipError as exc:
-			if self._lip_sync_strict:
-				raise
-			if self._lip_sync_debug:
-				print(
-					f"[lip-sync] segment {scene_id}#{index}: wav2lip failed, falling back: {exc}",
-					flush=True,
+		if not lip_synced_path.exists():
+			try:
+				self._lip_sync.lip_sync(
+					raw_clip_path,
+					segment_audio_path,
+					lip_synced_path,
 				)
-			return {
-				"segment": index,
-				"status": "fallback",
-				"reason": str(exc).splitlines()[0] if str(exc) else "wav2lip error",
-			}
+			except Wav2LipError as exc:
+				if self._lip_sync_strict:
+					raise
+				if self._lip_sync_debug:
+					print(f"[lip-sync] segment {scene_id}#{index}: wav2lip failed, falling back: {exc}", flush=True)
+				return {"segment": index, "status": "fallback", "reason": str(exc).splitlines()[0] if str(exc) else "wav2lip error"}
 
 		try:
 			self._ffmpeg.normalize_clip(
@@ -406,7 +395,8 @@ class VideoAgent:
 				continue
 			prompt = self._build_speaker_prompt(scene, character)
 			image_path = images_dir / f"{scene.id}_{speaker_id}.png"
-			self._image_tool.generate(prompt, image_path, width, height, seed=seed)
+			if not image_path.exists():
+				self._image_tool.generate(prompt, image_path, width, height, seed=seed)
 			self._validate_image_file(image_path, scene.id)
 			speaker_images[speaker_id] = image_path
 			speaker_prompts[speaker_id] = {
@@ -416,9 +406,8 @@ class VideoAgent:
 		if not speaker_images:
 			fallback_prompt = scene.visual_prompt
 			fallback_path = images_dir / f"{scene.id}_scene.png"
-			self._image_tool.generate(
-				fallback_prompt, fallback_path, width, height, seed=seed
-			)
+			if not fallback_path.exists():
+				self._image_tool.generate(fallback_prompt, fallback_path, width, height, seed=seed)
 			self._validate_image_file(fallback_path, scene.id)
 			speaker_images["scene"] = fallback_path
 			speaker_prompts["scene"] = {

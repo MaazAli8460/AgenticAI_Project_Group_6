@@ -1,0 +1,16 @@
+1
+00:00:00,000 --> 00:00:01,578
+I've found something incredible!
+
+2
+00:00:05,000 --> 00:00:07,043
+But at what cost to the Martian life?
+
+3
+00:00:15,000 --> 00:00:17,229
+Maya, we're receiving your transmission.
+
+4
+00:00:17,429 --> 00:00:19,379
+I'm doing what's right for humanity.
+
