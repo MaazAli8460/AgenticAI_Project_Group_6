@@ -62,6 +62,18 @@ ELEVENLABS_VOICE_ID_MALE=
 ELEVENLABS_VOICE_ID_NEUTRAL=
 ELEVENLABS_MODEL=eleven_multilingual_v2
 ELEVENLABS_OUTPUT_FORMAT=wav_22050
+EDGE_TTS_VOICE=
+EDGE_TTS_VOICE_FEMALE=
+EDGE_TTS_VOICE_MALE=
+EDGE_TTS_VOICE_NEUTRAL=
+EDGE_TTS_RATE=+0%
+EDGE_TTS_PITCH=+0Hz
+EDGE_TTS_VOLUME=+0%
+EDGE_TTS_OUTPUT_FORMAT=riff-24khz-16bit-mono-pcm
+PIPER_BIN=
+PIPER_MODEL=
+PIPER_CONFIG=
+PIPER_SPEAKER=
 BGM_LIBRARY_DIR=
 BGM_GAIN=0.2
 DIALOGUE_GAIN=0.9
@@ -159,6 +171,17 @@ If ELEVENLABS_VOICE_ID is not set, the TTS tool will fetch your available Eleven
 select one based on character gender, style/tone keywords, accent, and age labels when possible.
 Note: this requires an ElevenLabs API key with voices_read permission. If your key does not
 include voices_read, set ELEVENLABS_VOICE_ID_FEMALE/MALE/NEUTRAL explicitly.
+
+Free TTS option (Piper):
+- Download Piper and a voice model (onnx + json), then set `TTS_PROVIDER=piper`.
+- Set `PIPER_BIN` to the Piper binary (or leave empty if `piper` is on PATH).
+- Set `PIPER_MODEL` to the .onnx model path and `PIPER_CONFIG` to the .json config path.
+- Optional: set `PIPER_SPEAKER` or pass `piper_speaker` in voice params for multi-speaker models.
+
+Free TTS option (Edge TTS):
+- Install `edge-tts` and set `TTS_PROVIDER=edge` (or leave as `auto` to try it after ElevenLabs).
+- Set `EDGE_TTS_VOICE_FEMALE` / `EDGE_TTS_VOICE_MALE` (for example: `en-US-JennyNeural`, `en-US-GuyNeural`).
+- Optional: set `EDGE_TTS_RATE`, `EDGE_TTS_PITCH`, `EDGE_TTS_VOLUME`.
 
 **Important Note for Free Tier ElevenLabs Users:**
 If you are using a VPN, a proxy, or have multiple free accounts associated with your IP address, ElevenLabs will instantly flag your key and throw a `401 Unauthorized: Unusual activity detected.` error. If you encounter this, either use a clean IP or bypass ElevenLabs by setting `TTS_PROVIDER=none` in your `.env` to fallback to an offline synthetic tone generator.

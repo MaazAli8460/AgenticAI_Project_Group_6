@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import asyncio
+import audioop
 import os
+import subprocess
 import sys
+import wave
+from array import array
 from pathlib import Path
 from typing import Optional
 
@@ -9,7 +14,13 @@ import httpx
 
 from shared.schemas.state import VoiceProfile
 
-from .audio_utils import estimate_duration_ms, generate_tone_samples, read_wav, write_wav
+from .audio_utils import (
+	SAMPLE_RATE,
+	estimate_duration_ms,
+	generate_tone_samples,
+	read_wav,
+	write_wav,
+)
 
 
 STYLE_FREQUENCIES = {
@@ -38,7 +49,11 @@ class TtsTool:
 		base_url: str = "https://api.elevenlabs.io/v1",
 		timeout_s: float = 60.0,
 	) -> None:
-		self._provider = provider or os.getenv("TTS_PROVIDER", "auto")
+		provider_value = provider or os.getenv("TTS_PROVIDER", "auto")
+		provider_slug = str(provider_value).strip().lower()
+		if provider_slug in {"edge-tts", "edge_tts"}:
+			provider_slug = "edge"
+		self._provider = provider_slug
 		self._debug = os.getenv("TTS_DEBUG", "").lower() in {"1", "true", "yes"}
 		self._strict = os.getenv("TTS_STRICT", "").lower() in {"1", "true", "yes"}
 		self._api_key = os.getenv("ELEVENLABS_API_KEY")
@@ -59,6 +74,25 @@ class TtsTool:
 		)
 		self._voice_catalog: Optional[list[dict[str, object]]] = None
 		self._voice_cache: dict[str, str] = {}
+		self._piper_bin = os.getenv("PIPER_BIN") or "piper"
+		self._piper_model = os.getenv("PIPER_MODEL")
+		self._piper_config = os.getenv("PIPER_CONFIG")
+		self._piper_speaker = os.getenv("PIPER_SPEAKER")
+		self._edge_voice_default = os.getenv("EDGE_TTS_VOICE") or os.getenv(
+			"EDGE_TTS_VOICE_DEFAULT"
+		)
+		self._edge_voice_by_gender = {
+			"female": os.getenv("EDGE_TTS_VOICE_FEMALE"),
+			"male": os.getenv("EDGE_TTS_VOICE_MALE"),
+			"neutral": os.getenv("EDGE_TTS_VOICE_NEUTRAL"),
+		}
+		self._edge_rate = os.getenv("EDGE_TTS_RATE", "+0%")
+		self._edge_pitch = os.getenv("EDGE_TTS_PITCH", "+0Hz")
+		self._edge_volume = os.getenv("EDGE_TTS_VOLUME", "+0%")
+		self._edge_output_format = os.getenv(
+			"EDGE_TTS_OUTPUT_FORMAT",
+			"riff-24khz-16bit-mono-pcm",
+		)
 
 	def synthesize(self, text: str, voice: VoiceProfile, output_path: Path) -> int:
 		if self._can_use_elevenlabs():
@@ -84,6 +118,32 @@ class TtsTool:
 				self._maybe_warn("ElevenLabs voice_id could not be resolved; using fallback.")
 				if self._provider == "elevenlabs" or self._strict:
 					raise RuntimeError("ElevenLabs voice_id resolution failed.")
+		if self._can_use_edge():
+			edge_voice = self._resolve_edge_voice(voice)
+			if edge_voice:
+				self._maybe_warn(f"Using Edge TTS voice={edge_voice}")
+				try:
+					return self._synthesize_edge(text, edge_voice, output_path)
+				except Exception as exc:
+					self._maybe_warn(f"Edge TTS failed: {exc}")
+					if self._provider == "edge" or self._strict:
+						raise
+			else:
+				self._maybe_warn("Edge TTS voice not resolved; using fallback.")
+				if self._provider == "edge" or self._strict:
+					raise RuntimeError("Edge TTS voice not configured.")
+		elif self._provider == "edge" and self._strict:
+			raise RuntimeError(self._edge_availability_reason() or "Edge TTS unavailable.")
+		if self._can_use_piper():
+			self._maybe_warn("Using Piper TTS")
+			try:
+				return self._synthesize_piper(text, voice, output_path)
+			except Exception as exc:
+				self._maybe_warn(f"Piper TTS failed: {exc}")
+				if self._provider == "piper" or self._strict:
+					raise
+		elif self._provider == "piper" and self._strict:
+			raise RuntimeError(self._piper_availability_reason() or "Piper TTS unavailable.")
 		self._maybe_warn("Falling back to tone synthesis.")
 		return self._synthesize_tone(text, voice, output_path)
 
@@ -91,6 +151,16 @@ class TtsTool:
 		if self._provider not in {"auto", "elevenlabs"}:
 			return False
 		return bool(self._api_key and self._client)
+
+	def _can_use_edge(self) -> bool:
+		if self._provider not in {"auto", "edge"}:
+			return False
+		return self._edge_availability_reason() is None
+
+	def _can_use_piper(self) -> bool:
+		if self._provider not in {"auto", "piper"}:
+			return False
+		return self._piper_availability_reason() is None
 
 	def _synthesize_elevenlabs(
 		self, text: str, voice: VoiceProfile, output_path: Path, voice_id: str
@@ -127,12 +197,204 @@ class TtsTool:
 				pass
 		return duration_ms
 
+	def _synthesize_edge(self, text: str, voice_id: str, output_path: Path) -> int:
+		try:
+			import edge_tts
+		except ImportError as exc:
+			raise RuntimeError("edge-tts is not installed. Add it to requirements.txt") from exc
+
+		temp_path = output_path.with_name(f"{output_path.stem}_edge.wav")
+
+		async def _run() -> None:
+			communicate = edge_tts.Communicate(
+				text,
+				voice_id,
+				rate=self._edge_rate,
+				pitch=self._edge_pitch,
+				volume=self._edge_volume,
+				output_format=self._edge_output_format,
+			)
+			await communicate.save(str(temp_path))
+
+		self._run_async(_run())
+		self._resample_wav(temp_path, output_path, SAMPLE_RATE)
+		temp_path.unlink(missing_ok=True)
+
+		duration_ms = estimate_duration_ms(text)
+		if output_path.suffix.lower() == ".wav":
+			try:
+				sample_rate, samples = read_wav(output_path)
+				duration_ms = int(len(samples) / sample_rate * 1000)
+			except ValueError:
+				pass
+		return duration_ms
+
+	def _synthesize_piper(self, text: str, voice: VoiceProfile, output_path: Path) -> int:
+		reason = self._piper_availability_reason()
+		if reason is not None:
+			raise RuntimeError(reason)
+
+		model_path = Path(str(self._piper_model)).expanduser()
+		config_path = self._resolve_piper_config_path()
+		output_path.parent.mkdir(parents=True, exist_ok=True)
+
+		cmd = [
+			self._piper_bin,
+			"--model",
+			str(model_path),
+			"--output_file",
+			str(output_path),
+		]
+		if config_path is not None:
+			cmd += ["--config", str(config_path)]
+		speaker = self._resolve_piper_speaker(voice)
+		if speaker is not None:
+			cmd += ["--speaker", str(speaker)]
+
+		if self._debug:
+			print(f"[TTS] running: {' '.join(cmd)}", file=sys.stderr)
+
+		try:
+			result = subprocess.run(
+				cmd,
+				input=text.encode("utf-8"),
+				capture_output=True,
+				check=True,
+			)
+		except FileNotFoundError as exc:
+			raise RuntimeError(f"Piper binary not found: {self._piper_bin}") from exc
+		except subprocess.CalledProcessError as exc:
+			stdout = exc.stdout.decode(errors="ignore") if exc.stdout else ""
+			stderr = exc.stderr.decode(errors="ignore") if exc.stderr else ""
+			raise RuntimeError(
+				"Piper TTS failed.\n"
+				f"Command: {' '.join(cmd)}\n"
+				f"Stdout: {stdout}\nStderr: {stderr}"
+			) from exc
+
+		if not output_path.exists() or output_path.stat().st_size == 0:
+			stdout = result.stdout.decode(errors="ignore") if result.stdout else ""
+			stderr = result.stderr.decode(errors="ignore") if result.stderr else ""
+			raise RuntimeError(
+				"Piper produced no output.\n"
+				f"Command: {' '.join(cmd)}\n"
+				f"Stdout: {stdout}\nStderr: {stderr}"
+			)
+
+		duration_ms = estimate_duration_ms(text)
+		if output_path.suffix.lower() == ".wav":
+			try:
+				sample_rate, samples = read_wav(output_path)
+				duration_ms = int(len(samples) / sample_rate * 1000)
+			except ValueError:
+				pass
+		return duration_ms
+
 	def _synthesize_tone(self, text: str, voice: VoiceProfile, output_path: Path) -> int:
 		duration_ms = estimate_duration_ms(text)
 		frequency = self._voice_frequency(voice)
 		samples = generate_tone_samples(duration_ms, frequency_hz=frequency, volume=0.2)
 		write_wav(output_path, samples)
 		return duration_ms
+
+	def _edge_availability_reason(self) -> Optional[str]:
+		try:
+			import edge_tts  # noqa: F401
+		except ImportError:
+			return "edge-tts is not installed"
+		return None
+
+	def _resolve_edge_voice(self, voice: VoiceProfile) -> Optional[str]:
+		params = voice.params or {}
+		override = params.get("edge_voice") or params.get("edge_voice_id")
+		if isinstance(override, str) and override.strip():
+			return override.strip()
+		gender = self._normalize_gender(voice.gender)
+		if gender and self._edge_voice_by_gender.get(gender):
+			value = self._edge_voice_by_gender.get(gender)
+			if isinstance(value, str) and value.strip():
+				return value.strip()
+		if self._edge_voice_default and self._edge_voice_default.strip():
+			return self._edge_voice_default.strip()
+		return None
+
+	def _resample_wav(self, src_path: Path, dest_path: Path, target_rate: int) -> None:
+		with wave.open(str(src_path), "rb") as wav_file:
+			channels = wav_file.getnchannels()
+			sample_width = wav_file.getsampwidth()
+			source_rate = wav_file.getframerate()
+			frames = wav_file.readframes(wav_file.getnframes())
+
+		if channels != 1 or sample_width != 2:
+			raise RuntimeError("Edge TTS output must be 16-bit mono WAV.")
+		if source_rate == target_rate:
+			dest_path.write_bytes(src_path.read_bytes())
+			return
+
+		converted, _ = audioop.ratecv(
+			frames,
+			sample_width,
+			channels,
+			source_rate,
+			target_rate,
+			None,
+		)
+		samples = array("h")
+		samples.frombytes(converted)
+		write_wav(dest_path, samples)
+
+	def _run_async(self, coro) -> None:
+		try:
+			loop = asyncio.get_running_loop()
+		except RuntimeError:
+			asyncio.run(coro)
+			return
+		if loop.is_running():
+			new_loop = asyncio.new_event_loop()
+			try:
+				new_loop.run_until_complete(coro)
+			finally:
+				new_loop.close()
+		else:
+			loop.run_until_complete(coro)
+
+	def _piper_availability_reason(self) -> Optional[str]:
+		if not self._piper_model:
+			return "PIPER_MODEL is not set"
+		model_path = Path(str(self._piper_model)).expanduser()
+		if not model_path.exists():
+			return f"PIPER_MODEL not found: {model_path}"
+		config_path = self._resolve_piper_config_path()
+		if config_path is None:
+			return "PIPER_CONFIG is not set and model JSON is missing"
+		if not config_path.exists():
+			return f"PIPER_CONFIG not found: {config_path}"
+		if self._piper_bin and ("/" in self._piper_bin or "\\" in self._piper_bin):
+			bin_path = Path(self._piper_bin).expanduser()
+			if not bin_path.exists():
+				return f"PIPER_BIN not found: {bin_path}"
+		return None
+
+	def _resolve_piper_config_path(self) -> Optional[Path]:
+		if self._piper_config:
+			return Path(str(self._piper_config)).expanduser()
+		if not self._piper_model:
+			return None
+		model_path = Path(str(self._piper_model)).expanduser()
+		candidate = model_path.with_suffix(model_path.suffix + ".json")
+		if candidate.exists():
+			return candidate
+		return None
+
+	def _resolve_piper_speaker(self, voice: VoiceProfile) -> Optional[str]:
+		params = voice.params or {}
+		for key in ("piper_speaker", "piper_speaker_id", "piper_speaker_idx"):
+			value = params.get(key)
+			if value is not None:
+				return str(value)
+		if self._piper_speaker:
+			return str(self._piper_speaker)
+		return None
 
 	def _resolve_voice_id(
 		self, voice: VoiceProfile, exclude_ids: Optional[set[str]] = None
